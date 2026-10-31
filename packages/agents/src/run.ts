@@ -47,7 +47,8 @@ async function main(): Promise<void> {
   }
   if (which === "all" || which === "pricebot") {
     const a = agent("pricebot");
-    runs.push(loop(() => a.call(`${api}/price/SUI`), () => 5 * 60_000));
+    // Steady schedule. Each payment costs ~0.003 SUI of gas, so every 25 min keeps a multi-day run affordable.
+    runs.push(loop(() => a.call(`${api}/price/SUI`), () => 25 * 60_000));
   }
   if (which === "all" || which === "rogue") {
     const a = agent("rogue");
