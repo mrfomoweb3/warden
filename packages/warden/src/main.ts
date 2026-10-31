@@ -59,6 +59,7 @@ async function main(): Promise<void> {
     stopping = true;
     owner.stop();
     log("flushing memory before exit…");
+    warden.persistProgress();
     await memory.flush().catch(() => {});
     await memory.save();
     process.exit(0);

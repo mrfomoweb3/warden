@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { WardenMemory } from "../src/memory/store.js";
+import { mockBackend } from "../src/memory/walrus.js";
 import { addr, AGENT_IDS, makeWarden } from "./helpers.js";
 
 const button = (owner: { sent: { buttons?: { data: string }[][] }[] }, label: string) => {
@@ -109,5 +111,21 @@ describe("Warden learning loop", () => {
     expect(hits.some((h) => h.includes("rule_001"))).toBe(true);
     expect(t.memory.stats().pending).toBe(0);
     expect(t.memory.stats().walrusWrites).toBeGreaterThanOrEqual(10);
+  });
+
+  it("keeps today's counters across a restart on a fresh machine", async () => {
+    const backend = mockBackend("restart");
+    const t = await makeWarden(undefined, { backend });
+    t.chain.spend("pricebot", addr(0xf1), 0.001, t.tick(1_000));
+    t.chain.spend("pricebot", addr(0xf1), 0.001, t.tick(1_000));
+    await t.cycle();
+    t.warden.persistProgress(); // what shutdown and the 15-min checkpoint do
+    await t.memory.flush();
+
+    const fresh = new WardenMemory(backend, null);
+    await fresh.rebuildFromWalrus(["metric", "cursor"]);
+    const today = new Date(t.now()).toISOString().slice(0, 10);
+    expect(fresh.get("metric", today)).toMatchObject({ events: 2 });
+    expect(fresh.get("cursor", "observer")?.event_cursor).not.toBeNull();
   });
 });

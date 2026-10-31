@@ -42,10 +42,11 @@ tr:last-child td { border-bottom: 0; }
 .dot { width: 7px; height: 7px; border-radius: 50%; }
 
 .rules { list-style: none; margin: 0; padding: 0; }
-.rules li { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 12px; }
+.rules li { padding: 12px 0; border-bottom: 1px solid var(--line); }
 .rules li:last-child { border-bottom: 0; }
 .rules li.off { opacity: .45; text-decoration: line-through; }
-.rules .id { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; padding-top: 2px; }
+/* Rule ids live in the meta line so long ids (default_new_counterparty) never collide with the text. */
+.rules .id { font: 11.5px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); overflow-wrap: anywhere; }
 .rules .meta { color: var(--muted); font-size: 12px; margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .tag { padding: 2px 8px; border-radius: 999px; background: var(--card-2); color: var(--ink-2); }
 .tag.learned { background: #eef1e4; color: var(--olive); }
@@ -306,9 +307,8 @@ function render(s) {
 
   const rules = [...s.rules].sort((a, b) => (a.source === "default") - (b.source === "default") || b.created.localeCompare(a.created));
   $("rulesList").innerHTML = rules.map((r) => `<li class="${r.enabled ? "" : "off"}">
-      <span class="id">${esc(r.id.replace("default_", "default"))}</span>
       <div><div>${esc(r.text)}</div>
-      <div class="meta"><span>${ACTION[r.action].icon} ${r.action}</span>
+      <div class="meta"><span class="id">${esc(r.id.startsWith("default_") ? r.id.slice(8).replaceAll("_", " ") : r.id)}</span><span>${ACTION[r.action].icon} ${r.action}</span>
       <span class="tag ${r.source === "feedback" ? "learned" : ""}">${SOURCE[r.source]}</span>
       ${r.learnedFrom ? `<span>from ${esc(r.learnedFrom)}</span>` : ""}${r.source !== "default" ? `<span>${when(r.created)}</span>` : ""}</div></div></li>`).join("");
 
