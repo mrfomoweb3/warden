@@ -2,7 +2,7 @@
 
 A spend watchdog for your AI agents' wallets on Sui.
 
-![Sui testnet](https://img.shields.io/badge/Sui-testnet-4da2ff) ![Walrus Memory](https://img.shields.io/badge/Walrus%20Memory-mainnet-111) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6) ![Move](https://img.shields.io/badge/Move-SpendVault-6c5ce7)
+![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Sui testnet](https://img.shields.io/badge/Sui-testnet-4da2ff) ![Walrus Memory](https://img.shields.io/badge/Walrus%20Memory-mainnet-111) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6) ![Move](https://img.shields.io/badge/Move-SpendVault-6c5ce7)
 
 Warden watches every payment your AI agents make on Sui, learns what normal looks like for each agent, and enforces rules you give it once in plain English. It doesn't just alert: agents spend through a Move contract that Warden can pause on-chain, without a confirm button. Every rule, incident and owner reply lives in Walrus Memory, so Warden remembers far past the chain's 3-day window, and the same memory is readable from Claude Code.
 
@@ -368,7 +368,7 @@ Never commit keys. Secrets belong in `.env`.
 
 ## License
 
-_Add a license_
+[MIT](LICENSE) © 2026 mrfomoweb3
 
 ## Team and acknowledgements
 
