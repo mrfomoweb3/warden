@@ -6,3 +6,4 @@ dist/
 packages/vault/build/
 .warden/
 *.log
+.DS_Store

@@ -1,0 +1,11 @@
+**/node_modules
+.env
+.env.*
+!.env.example
+.warden
+packages/vault/build
+.git
+docs
+*.log
+.DS_Store
+sky_and_grass_background.svg
