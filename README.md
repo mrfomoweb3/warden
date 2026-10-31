@@ -10,7 +10,7 @@ Warden watches every payment your AI agents make on Sui, learns what normal look
 
 > 🎥 Demo video: _add link_
 >
-> 🌐 Live dashboard: _add link_
+> 🌐 Live: [usewarden.fly.dev](https://usewarden.fly.dev) (landing page) · [usewarden.fly.dev/dashboard](https://usewarden.fly.dev/dashboard) (live dashboard)
 >
 > 🤖 Telegram bot: [@usewarden_bot](https://t.me/usewarden_bot) (answers only the owner's chat during the testnet run)
 
@@ -286,7 +286,21 @@ OWNER_PRIVATE_KEY=$(sui keytool export --key-identity <owner> --json | jq -r .ex
 
 Gas note: each agent payment costs about 0.003 SUI in gas. Fund agents accordingly for multi-day runs.
 
-Hosting: _add hosting details_
+### Host it on Fly.io
+
+The whole stack runs as one always-on machine. [scripts/start-all.mjs](scripts/start-all.mjs) supervises the paid APIs, Warden, the agents and the dashboard, restarting any that crash. The dashboard is served on Fly's public URL. No volume is needed: on boot, Warden rebuilds its memory from Walrus.
+
+```bash
+brew install flyctl && fly auth login
+# set `app` in fly.toml to a unique name, then:
+fly apps create <app-name>
+grep -E '^[A-Z_0-9]+=[^ #]' .env | sed -E 's/[[:space:]]+#.*$//' | fly secrets import   # secrets from .env, never baked into the image
+fly deploy --ha=false   # exactly one machine: two Wardens would act twice and fight over the Telegram bot
+```
+
+Run only one copy at a time. Stop any local run before deploying, because Telegram allows one poller per bot token.
+
+Run it locally the same way with `pnpm start` (`PORT` sets the dashboard port; `RUN_AGENTS=false` skips the demo agents).
 
 ## Usage
 
@@ -337,7 +351,7 @@ pnpm --filter @warden/warden metrics > docs/learning-curve.csv   # per-day learn
 - [x] On-chain pause of a looping agent, verified live
 - [x] Telegram owner channel with plain-English rules (Groq) and explained alerts
 - [x] Live dashboard and landing page
-- [ ] Host the stack 24/7 with a public dashboard link
+- [x] Host the stack 24/7 on Fly.io with a public dashboard link
 - [ ] Multi-day run to show the learning curve on real data
 - [ ] Public Telegram demo mode for judges
 - [ ] Decide on a mainnet SpendVault deployment
