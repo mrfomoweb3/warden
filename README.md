@@ -11,10 +11,21 @@ Warden watches every payment your AI agents make on Sui, learns what normal look
 > 🎥 Demo video: _add link_
 >
 > 🌐 Live dashboard: _add link_
+>
+> 🤖 Telegram bot: [@usewarden_bot](https://t.me/usewarden_bot) (answers only the owner's chat during the testnet run)
 
 ![Warden live dashboard: 41 payments watched, 27 memories on Walrus, rogue agent paused on-chain](docs/dashboard.png)
 
 The screenshot is the live dashboard during a real testnet run. Warden has watched 41 payments, asked the owner 9 questions, paused the looping `rogue` agent on-chain, and written 27 memories to Walrus Memory mainnet.
+
+### Telegram
+
+<p>
+  <img src="docs/telegram-alerts.png" alt="Warden asking the owner about new counterparties in Telegram, each alert with a plain-language explanation and Allow once / Always allow / Pause agent buttons" width="360">
+  <img src="docs/telegram-bot.png" alt="The Warden bot profile in Telegram, @usewarden_bot" width="360">
+</p>
+
+Real alerts from the testnet run. Each question names the agent, the counterparty, the amount and the transaction. The 💬 line is the model's plain-language explanation, written after Warden has already decided. The buttons are **Allow once**, **Always allow** (which becomes a rule) and **Pause agent**.
 
 ## Contents
 
@@ -245,10 +256,16 @@ docs/          demo script and screenshots
 | Vault object | [`0x3b7388b0…113135`](https://suiscan.xyz/testnet/object/0x3b7388b0d82848c22a3bdf58fff56c96639d49a8e8278796473a638650113135) |
 | Publish tx | [`FrUyqASe…BC5P`](https://suiscan.xyz/testnet/tx/FrUyqASeLSFvemXRT7R3ShKK1auMdGrSe3f2U2jxBC5P) |
 | Setup txs | [`4YCvAL6h…2ynCm`](https://suiscan.xyz/testnet/tx/4YCvAL6hx3CnFrZ1h9LKKhNA2Xg4wvnruKwoGcX2ynCm), [`8smXVajN…L3yW`](https://suiscan.xyz/testnet/tx/8smXVajNmS3B5A876XTayaDuZwystarVN4jAwmjxL3yW) |
+| `WardenCap` (held by Warden) | [`0x2deafd19…398d18`](https://suiscan.xyz/testnet/object/0x2deafd19121cb4e4294b490c1f2de14c35dea7b33b94187bfad026f51d398d18) |
+| `SpenderCap`: researcher | [`0x10967231…ed9478`](https://suiscan.xyz/testnet/object/0x10967231d824cc6eb76343ce328a86dbdc03aa2033e59c185cd15e73c6ed9478) |
+| `SpenderCap`: pricebot | [`0xb26fcb7f…6ff37e`](https://suiscan.xyz/testnet/object/0xb26fcb7fe7d1525050a54d8fd7141fb842b4f1f56c7873d73d3eea11536ff37e) |
+| `SpenderCap`: rogue | [`0x0a91b7a6…75c630`](https://suiscan.xyz/testnet/object/0x0a91b7a6048bad89c1b87c6887c10697551bf2632f2e89b9136812e5a575c630) |
+| Vault owner | [`0x1f218133…23e6f4`](https://suiscan.xyz/testnet/account/0x1f218133c180002e9ba3d14fc29e13bdcedfd33e463fef77e0b3ec357823e6f4) |
 | Example agent payment (x402 via vault) | [`3N1pdRKp…xt4d`](https://suiscan.xyz/testnet/tx/3N1pdRKpJL7M5Zn46sDsXaBucrc81Fj4yDZCdGftxt4d) |
 | Example risk check Warden paid for (x402) | [`88zNpyJA…zdAR`](https://suiscan.xyz/testnet/tx/88zNpyJAkCfGhQz6UgET8nnxMJb988Dh8qwGbvZPzdAR) |
+| Warden pausing `rogue` on-chain (30 payments in 10 min) | [`FimJPaM3…pju8`](https://suiscan.xyz/testnet/tx/FimJPaM3fQ5kw6NA29VmGSAg23xkar1NjGc71X9Ypju8) |
 
-Walrus Memory writes go to mainnet through the relayer.
+Walrus Memory writes go to mainnet through the relayer (30 written so far in the testnet run).
 
 ### Deploy your own
 
