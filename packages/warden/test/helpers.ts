@@ -1,6 +1,6 @@
 import { ConsoleChannel } from "@warden/bot";
 import type { VaultActuator } from "../src/act/vault.js";
-import { WardenMemory } from "../src/memory/store.js";
+import { WardenMemory, type MemoryBackend } from "../src/memory/store.js";
 import { mockBackend } from "../src/memory/walrus.js";
 import type { AlertExplainer } from "../src/policy/explain.js";
 import { PatternIntentParser } from "../src/policy/parser.js";
@@ -9,11 +9,11 @@ import { Warden } from "../src/warden.js";
 
 export { addr, AGENT_IDS, FakeChain, FakeVault, PKG, units, VAULT } from "../src/sim/fakes.js";
 
-export async function makeWarden(start = Date.UTC(2026, 9, 22, 9), opts: { explainer?: AlertExplainer } = {}) {
+export async function makeWarden(start = Date.UTC(2026, 9, 22, 9), opts: { explainer?: AlertExplainer; backend?: MemoryBackend } = {}) {
   const chain = new FakeChain();
   const vault = new FakeVault();
   const owner = new ConsoleChannel(false);
-  const memory = new WardenMemory(mockBackend(), null);
+  const memory = new WardenMemory(opts.backend ?? mockBackend(), null);
   let now = start;
   const warden = new Warden({
     chain: chain.asChain(),

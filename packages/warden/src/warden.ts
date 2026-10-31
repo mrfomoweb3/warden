@@ -309,7 +309,7 @@ export class Warden {
     this.closeFinishedPeriods();
     if (this.now() - this.lastCursorCheckpoint > CURSOR_CHECKPOINT_MS) {
       this.lastCursorCheckpoint = this.now();
-      this.checkpointCursor(true);
+      this.persistProgress();
     } else {
       this.checkpointCursor(false);
     }
@@ -388,6 +388,16 @@ export class Warden {
     }
   }
   private metricsClosed = new Set<string>();
+
+  /**
+   * Writes the observer cursor and today's running counters to Walrus, so a restart on a
+   * fresh machine (e.g. a redeploy) resumes both. Called every 15 min and on shutdown.
+   */
+  persistProgress(): void {
+    this.checkpointCursor(true);
+    const today = this.d.memory.get("metric", day(this.now()));
+    if (today) this.d.memory.put(today);
+  }
 
   private metric(dy: string): Metric {
     return this.d.memory.get("metric", dy) ?? { type: "metric", day: dy, events: 0, auto_handled: 0, escalations: 0, pauses: 0, tightens: 0, rules_learned: 0 };

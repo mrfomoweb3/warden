@@ -10,4 +10,11 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
+  {
+    // Plain Node scripts (e.g. the start-all supervisor).
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      globals: { process: "readonly", console: "readonly", setTimeout: "readonly", setInterval: "readonly", clearInterval: "readonly" },
+    },
+  },
 );
