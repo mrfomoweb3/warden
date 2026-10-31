@@ -1,0 +1,12 @@
+{
+  "name": "@warden/paid-apis",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx --env-file-if-exists=../../.env src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": { "@mysten/sui": "^2.37.0", "@warden/shared": "workspace:*" }
+}

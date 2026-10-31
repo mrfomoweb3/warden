@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Warden Dashboard</title>
+<link rel="stylesheet" href="/theme.css">
+<style>
+.top { border-radius: 0 0 36px 36px; padding-bottom: 150px; }
+.top-copy { position: relative; z-index: 4; text-align: center; padding: 40px 16px 0; }
+.top h1 { font-size: clamp(44px, 6.4vw, 88px); margin: 18px auto 14px; max-width: 14ch; }
+.top .sub { color: var(--ink-2); margin: 0; }
+main { position: relative; z-index: 5; max-width: 1200px; margin: -110px auto 0; padding: 0 16px 64px; display: grid; gap: 16px; }
+.row { display: grid; gap: 16px; }
+.r3 { grid-template-columns: 1.4fr 1fr 1fr; }
+.r2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 900px) { .r3, .r2 { grid-template-columns: minmax(0, 1fr); } }
+.card h2 { font-family: var(--serif); font-weight: 400; font-size: 34px; letter-spacing: -0.03em; line-height: 1; margin: 0 0 6px; }
+.hint { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+.head { display: flex; align-items: flex-start; gap: 12px; }
+.head .grow { flex: 1; }
+.ghost { all: unset; cursor: pointer; font-size: 12.5px; color: var(--ink-2); padding: 6px 12px; border-radius: 10px; background: var(--card-2); }
+.ghost:hover { background: var(--line); }
+.ghost:focus-visible { outline: 2px solid var(--olive); }
+.stats { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.big { font-size: 60px; font-weight: 400; letter-spacing: -0.045em; line-height: 1; margin-top: 18px; }
+
+.chart { position: relative; }
+.chart svg { width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font: 11px var(--sans); font-variant-numeric: tabular-nums; }
+.tip { position: absolute; pointer-events: none; background: #1d1d1d; color: #fff; font-size: 12px; padding: 7px 10px; border-radius: 9px; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); opacity: 0; transition: opacity .1s; z-index: 2; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; color: var(--muted); font-weight: 400; font-size: 13px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tr:last-child td { border-bottom: 0; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; }
+.who-cell { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.ag { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 600; color: #fff; flex: none; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; background: var(--card-2); }
+.dot { width: 7px; height: 7px; border-radius: 50%; }
+
+.rules { list-style: none; margin: 0; padding: 0; }
+.rules li { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 12px; }
+.rules li:last-child { border-bottom: 0; }
+.rules li.off { opacity: .45; text-decoration: line-through; }
+.rules .id { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; padding-top: 2px; }
+.rules .meta { color: var(--muted); font-size: 12px; margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tag { padding: 2px 8px; border-radius: 999px; background: var(--card-2); color: var(--ink-2); }
+.tag.learned { background: #eef1e4; color: var(--olive); }
+.list { max-height: 460px; overflow-y: auto; }
+
+.feed { background: var(--card-2); border-radius: 18px; padding: 14px; }
+.bubble time { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; font-weight: 400; }
+
+.incident { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.incident:last-child { border-bottom: 0; }
+.incident .ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--card-2); font-size: 15px; }
+.incident .meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.incident .what { overflow-wrap: anywhere; font-size: 14px; }
+
+.memories { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.memories li { font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; padding: 12px 14px; background: var(--card-2); border-radius: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
+.empty { color: var(--muted); padding: 28px 0; text-align: center; }
+.alert { background: #fff; border-radius: 16px; padding: 14px 18px; color: var(--ink-2); box-shadow: var(--shadow); }
+</style>
+</head>
+<body>
+
+<section class="sky top">
+  <nav class="nav">
+    <a class="brand" href="/" aria-label="Warden home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="3" fill="#111"/><rect x="18" y="2" width="12" height="12" rx="6" fill="#111"/><rect x="2" y="18" width="12" height="12" rx="6" fill="#111"/><path d="M18 18h12v5a7 7 0 0 1-7 7h-5z" fill="#111"/></svg>
+      Warden
+    </a>
+    <div class="pillnav" role="navigation" aria-label="Sections">
+      <a href="/" aria-label="Home"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></a>
+      <a href="/dashboard" aria-current="page" aria-label="Dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg></a>
+      <a href="#rules" aria-label="Rules"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></a>
+      <a href="#memory" aria-label="Memory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></a>
+      <a href="#agents" aria-label="Agents"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6z"/></svg></a>
+    </div>
+    <div class="right"><span class="badge" id="mode">…</span></div>
+  </nav>
+  <div class="top-copy">
+    <h1 class="serif">Your agents, quietly watched</h1>
+    <p class="sub" id="updated"></p>
+  </div>
+</section>
+
+<main>
+  <div class="alert" id="banner" hidden></div>
+  <div class="alert" id="error" hidden></div>
+
+  <section class="row r3" aria-label="Totals">
+    <div class="card">
+      <div class="eyebrow"><span>Payments watched</span><span id="k-total">—</span></div>
+      <div class="stats">
+        <div><div class="stat olive" id="k-silent">—</div><div class="stat-label olive">handled silently</div></div>
+        <div><div class="stat" id="k-questions">—</div><div class="stat-label">asked you</div></div>
+        <div><div class="stat maroon" id="k-pauses">—</div><div class="stat-label maroon">pauses</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="eyebrow"><span>Rules learned</span><span id="k-defaults">—</span></div>
+      <div class="big olive" id="k-rules">—</div>
+    </div>
+    <div class="card">
+      <div class="eyebrow"><span>Memories on Walrus</span><span id="k-pending"></span></div>
+      <div class="big" id="k-mem">—</div>
+    </div>
+  </section>
+
+  <section class="row r2">
+    <div class="card">
+      <div class="head"><div class="grow"><h2>Questions to you</h2><p class="hint">Escalations per day. This should fall as Warden learns.</p></div><button class="ghost" data-toggle="questions" type="button">Table</button></div>
+      <div class="chart" id="questions"></div>
+    </div>
+    <div class="card">
+      <div class="head"><div class="grow"><h2>Rules learned</h2><p class="hint">Running total, from your replies and plain-English instructions.</p></div><button class="ghost" data-toggle="rules" type="button">Table</button></div>
+      <div class="chart" id="rulesChart"></div>
+    </div>
+  </section>
+
+  <section class="card" id="agents">
+    <h2>Agents</h2>
+    <p class="hint">Every agent spends through SpendVault, so Warden can pause it on-chain.</p>
+    <div class="scroll"><table id="agentsTable"></table></div>
+  </section>
+
+  <section class="row r2">
+    <div class="card" id="rules">
+      <h2>Rules</h2>
+      <p class="hint">Rules are data. Learned rules override the cautious week-one defaults.</p>
+      <div class="list"><ul class="rules" id="rulesList"></ul></div>
+    </div>
+    <div class="card">
+      <h2>Owner channel</h2>
+      <p class="hint" id="feedHint">What Warden asked you and how you answered, newest first.</p>
+      <div class="feed list"><div class="chat" id="feed"></div></div>
+    </div>
+  </section>
+
+  <section class="row r2">
+    <div class="card">
+      <h2>Incidents</h2>
+      <p class="hint">Everything Warden acted on or asked about, newest first.</p>
+      <div class="list" id="incidents"></div>
+    </div>
+    <div class="card" id="memory">
+      <h2>What Walrus Memory holds</h2>
+      <p class="hint">A sample of Warden's memories, in the same words Claude Code reads through the Walrus Memory MCP.</p>
+      <ul class="memories" id="memories"></ul>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const fmt = new Intl.NumberFormat();
+const dayLabel = (d) => new Date(d + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" });
+const when = (iso) => new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) + " UTC";
+const usd = (n) => "$" + (n < 1 ? n.toFixed(3) : n.toFixed(2));
+const AGENT_COLORS = ["#5f6f2e", "#3f5f7d", "#8c3b3b", "#6a5a8c", "#8a6d2b"];
+const tableMode = { questions: false, rules: false };
+let last = null;
+
+document.querySelectorAll("[data-toggle]").forEach((b) => b.onclick = () => {
+  const k = b.dataset.toggle; tableMode[k] = !tableMode[k];
+  b.textContent = tableMode[k] ? "Chart" : "Table";
+  if (last) renderCharts(last);
+});
+
+/** Whole-number axis: 4 ticks with an integer step, so counts never show fractional ticks. */
+function niceMax(v) { const step = Math.max(1, Math.ceil(v / 4)); const p = 10 ** Math.floor(Math.log10(step)); const nice = [1, 2, 3, 5, 10].map((k) => k * p).find((k) => k >= step) ?? step; return nice * 4; }
+
+function frame(data, max, w = 520, h = 220) {
+  const m = { l: 30, r: 8, t: 12, b: 26 };
+  const iw = w - m.l - m.r, ih = h - m.t - m.b;
+  const x = (i) => m.l + (iw / data.length) * (i + 0.5);
+  const y = (v) => m.t + ih - (v / max) * ih;
+  let g = "";
+  for (let i = 0; i <= 4; i++) {
+    const v = (max / 4) * i, yy = y(v);
+    g += `<line x1="${m.l}" x2="${w - m.r}" y1="${yy}" y2="${yy}" stroke="${i === 0 ? "#d6d5ce" : "#efeee9"}" stroke-width="1"/>`;
+    g += `<text x="${m.l - 6}" y="${yy + 4}" text-anchor="end">${v}</text>`;
+  }
+  const every = Math.ceil(data.length / 7);
+  data.forEach((d, i) => { if (i % every === 0) g += `<text x="${x(i)}" y="${h - 8}" text-anchor="middle">${dayLabel(d.day)}</text>`; });
+  return { w, h, m, iw, ih, x, y, g };
+}
+
+function tip(el, html, px, py) {
+  let t = el.querySelector(".tip");
+  if (!t) { t = document.createElement("div"); t.className = "tip"; el.appendChild(t); }
+  if (html == null) { t.style.opacity = 0; return; }
+  t.innerHTML = html; t.style.left = px + "px"; t.style.top = py + "px"; t.style.opacity = 1;
+}
+
+function table(rows, cols) {
+  return `<div class="scroll"><table><thead><tr>${cols.map((c) => `<th class="${c.num ? "num" : ""}">${c.label}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${cols.map((c) => `<td class="${c.num ? "num" : ""}">${c.get(r)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+
+function barChart(el, data) {
+  if (!data.length) { el.innerHTML = `<p class="empty">No days recorded yet.</p>`; return; }
+  const max = niceMax(Math.max(1, ...data.map((d) => d.questions)));
+  const f = frame(data, max);
+  const slot = f.iw / data.length, bw = Math.max(4, Math.min(26, slot - 4));
+  let bars = "", hits = "";
+  data.forEach((d, i) => {
+    const x0 = f.x(i) - bw / 2, y0 = f.y(d.questions), base = f.y(0), hgt = base - y0;
+    if (d.questions > 0) {
+      const r = Math.min(6, hgt, bw / 2);
+      bars += `<path d="M${x0},${base} V${y0 + r} Q${x0},${y0} ${x0 + r},${y0} H${x0 + bw - r} Q${x0 + bw},${y0} ${x0 + bw},${y0 + r} V${base} Z" fill="var(--olive)"/>`;
+    }
+    if (d.pauses) bars += `<text x="${f.x(i)}" y="${y0 - 7}" text-anchor="middle" style="fill:var(--maroon);font-size:12px">⏸</text>`;
+    hits += `<rect x="${f.m.l + slot * i}" y="${f.m.t}" width="${slot}" height="${f.ih}" fill="transparent" data-i="${i}"/>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${f.w} ${f.h}" role="img" aria-label="Questions to owner per day">${f.g}${bars}${hits}</svg>`;
+  const svg = el.querySelector("svg");
+  svg.addEventListener("pointermove", (e) => {
+    const i = e.target.dataset?.i; if (i == null) return tip(el, null);
+    const d = data[i], s = svg.getBoundingClientRect().width / f.w;
+    tip(el, `<b>${dayLabel(d.day)}</b> · ${d.questions} question${d.questions === 1 ? "" : "s"}<br>${fmt.format(d.payments)} payments, ${fmt.format(d.silent)} silent${d.pauses ? `<br>⏸ ${d.pauses} paused` : ""}`, f.x(+i) * s, f.y(d.questions) * s);
+  });
+  svg.addEventListener("pointerleave", () => tip(el, null));
+}
+
+function stepChart(el, data) {
+  if (!data.length) { el.innerHTML = `<p class="empty">No days recorded yet.</p>`; return; }
+  const max = niceMax(Math.max(1, ...data.map((d) => d.rulesTotal)));
+  const f = frame(data, max);
+  const slot = f.iw / data.length;
+  let d = "";
+  data.forEach((p, i) => {
+    const xl = f.x(i) - slot / 2, xr = f.x(i) + slot / 2, yy = f.y(p.rulesTotal);
+    d += i === 0 ? `M${xl},${yy} H${xr}` : ` V${yy} H${xr}`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${f.w} ${f.h}" role="img" aria-label="Rules learned, running total">${f.g}
+    <path d="${d}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
+    <line class="xh" y1="${f.m.t}" y2="${f.m.t + f.ih}" stroke="#d6d5ce" stroke-width="1" opacity="0"/>
+    <circle class="mk" r="4.5" fill="var(--ink)" stroke="#fff" stroke-width="2" opacity="0"/>
+    <rect x="${f.m.l}" y="${f.m.t}" width="${f.iw}" height="${f.ih}" fill="transparent"/></svg>`;
+  const svg = el.querySelector("svg"), xh = svg.querySelector(".xh"), mk = svg.querySelector(".mk");
+  svg.addEventListener("pointermove", (e) => {
+    const r = svg.getBoundingClientRect(), s = r.width / f.w;
+    const i = Math.max(0, Math.min(data.length - 1, Math.floor(((e.clientX - r.left) / s - f.m.l) / slot)));
+    const p = data[i], cx = f.x(i), cy = f.y(p.rulesTotal);
+    xh.setAttribute("x1", cx); xh.setAttribute("x2", cx); xh.setAttribute("opacity", 1);
+    mk.setAttribute("cx", cx); mk.setAttribute("cy", cy); mk.setAttribute("opacity", 1);
+    tip(el, `<b>${dayLabel(p.day)}</b> · ${p.rulesTotal} rule${p.rulesTotal === 1 ? "" : "s"}`, cx * s, cy * s);
+  });
+  svg.addEventListener("pointerleave", () => { tip(el, null); xh.setAttribute("opacity", 0); mk.setAttribute("opacity", 0); });
+}
+
+function renderCharts(s) {
+  const cols = [
+    { label: "Day", get: (d) => dayLabel(d.day) },
+    { label: "Payments", num: true, get: (d) => fmt.format(d.payments) },
+    { label: "Silent", num: true, get: (d) => fmt.format(d.silent) },
+    { label: "Questions", num: true, get: (d) => d.questions },
+    { label: "Pauses", num: true, get: (d) => d.pauses },
+    { label: "Rules", num: true, get: (d) => d.rulesTotal },
+  ];
+  if (tableMode.questions) $("questions").innerHTML = table(s.days, cols); else barChart($("questions"), s.days);
+  if (tableMode.rules) $("rulesChart").innerHTML = table(s.days, cols); else stepChart($("rulesChart"), s.days);
+}
+
+const ACTION = {
+  pause: { icon: "⏸", label: "Paused" },
+  escalate: { icon: "❓", label: "Asked you" },
+  tighten: { icon: "🔒", label: "Tightened caps" },
+  allow: { icon: "✓", label: "Allowed" },
+};
+const SOURCE = { default: "default", telegram: "you said", feedback: "learned from your reply", "claude-code": "Claude Code" };
+
+function render(s) {
+  last = s;
+  $("error").hidden = true;
+  $("mode").textContent = s.mode === "simulated" ? "Simulated run" : "Live";
+  $("updated").textContent = s.mode === "simulated" ? `Simulated ${s.days.length}-day run · generated ${when(s.generated)}` : `Live · updated ${new Date().toLocaleTimeString()}`;
+  $("banner").hidden = s.mode !== "simulated";
+  $("banner").innerHTML = `<b>Simulated run.</b> This is the real Warden engine (rules, learning, memory) with scripted agents and a scripted owner. The chain, Walrus Memory and Telegram are stand-ins.`;
+
+  const t = s.totals, pct = t.payments ? Math.round((100 * t.silent) / t.payments) : 0;
+  $("k-total").textContent = fmt.format(t.payments);
+  $("k-silent").textContent = pct + "%";
+  $("k-questions").textContent = fmt.format(t.questions);
+  $("k-pauses").textContent = fmt.format(t.pauses);
+  $("k-rules").textContent = fmt.format(t.rulesLearned);
+  $("k-defaults").textContent = `+ ${s.rules.filter((r) => r.source === "default").length} defaults`;
+  $("k-mem").textContent = fmt.format(t.memoryWrites);
+  $("k-pending").textContent = t.pendingWrites ? `${t.pendingWrites} queued` : s.mode === "simulated" ? "mock" : "";
+
+  renderCharts(s);
+
+  $("agentsTable").innerHTML = s.agents.length ? `<thead><tr><th>Agent</th><th>Status</th><th class="num">Normal / day</th><th class="num">Usual counterparties</th><th class="num">Peak / hour</th><th class="num">Open questions</th></tr></thead><tbody>${s.agents.map((a, i) => `<tr>
+      <td><span class="who-cell"><span class="ag" style="background:${AGENT_COLORS[i % AGENT_COLORS.length]}">${esc(a.agent[0].toUpperCase())}</span>${esc(a.agent)}</span></td>
+      <td><span class="pill"><span class="dot" style="background:${a.paused ? "var(--critical)" : "var(--good)"}"></span>${a.paused ? "⏸ Paused" : "Active"}</span>${a.dailyCapUsd != null ? `<div class="hint" style="margin:4px 0 0">today ${usd(a.spentTodayUsd)} of ${usd(a.dailyCapUsd)}</div>` : ""}</td>
+      <td class="num">${a.daysObserved ? usd(a.normalDailyUsd) : "<span class='hint'>learning…</span>"}</td>
+      <td class="num">${a.counterparties}</td>
+      <td class="num">${a.peakPerHour}</td>
+      <td class="num">${a.openIncidents}</td></tr>`).join("")}</tbody>` : `<tbody><tr><td class="empty">No agents seen yet.</td></tr></tbody>`;
+
+  const rules = [...s.rules].sort((a, b) => (a.source === "default") - (b.source === "default") || b.created.localeCompare(a.created));
+  $("rulesList").innerHTML = rules.map((r) => `<li class="${r.enabled ? "" : "off"}">
+      <span class="id">${esc(r.id.replace("default_", "default"))}</span>
+      <div><div>${esc(r.text)}</div>
+      <div class="meta"><span>${ACTION[r.action].icon} ${r.action}</span>
+      <span class="tag ${r.source === "feedback" ? "learned" : ""}">${SOURCE[r.source]}</span>
+      ${r.learnedFrom ? `<span>from ${esc(r.learnedFrom)}</span>` : ""}${r.source !== "default" ? `<span>${when(r.created)}</span>` : ""}</div></div></li>`).join("");
+
+  $("feedHint").textContent = s.mode === "simulated" ? "Scripted owner replies in the simulation, newest first." : "Live conversations happen in Telegram.";
+  $("feed").innerHTML = s.feed.length ? s.feed.map((m) => `<div class="bubble ${m.from === "owner" ? "me" : ""}"><div class="who">${m.from === "owner" ? "You" : "Warden"}</div>${esc(m.text.replace(/<[^>]+>/g, ""))}<time>${when(m.ts)}</time></div>`).join("") : `<p class="empty">Owner messages appear here in simulated runs. Live, they're in Telegram.</p>`;
+
+  $("incidents").innerHTML = s.incidents.length ? s.incidents.map((i) => {
+    const a = ACTION[i.action];
+    return `<div class="incident"><span class="ic" aria-hidden="true">${a.icon}</span><div><div class="what">${esc(i.what)}</div>
+      <div class="meta">${a.label} · ${i.status === "open" ? "open" : esc(i.outcome || "resolved")} · ${when(i.created)}</div></div></div>`;
+  }).join("") : `<p class="empty">Nothing yet. Quiet is good.</p>`;
+
+  $("memories").innerHTML = s.memories.map((m) => `<li>${esc(m)}</li>`).join("");
+}
+
+async function refresh() {
+  try {
+    const r = await fetch("/api/state", { cache: "no-store" });
+    const body = await r.json();
+    if (!r.ok) throw new Error(body.error);
+    render(body);
+  } catch (e) {
+    $("error").hidden = false; $("error").textContent = e.message;
+  }
+}
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+/* Warden theme: soft sky, serif headlines, white rounded cards, dark pill buttons. */
+/* Fonts are served locally (latin subsets, both OFL) so a slow font CDN can't reflow the hero. */
+@font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: block; src: url("/instrument-serif.woff2") format("woff2"); }
+@font-face { font-family: Inter; font-style: normal; font-weight: 400 600; font-display: swap; src: url("/inter.woff2") format("woff2"); }
+
+:root {
+  color-scheme: light;
+  --page: #f4f4f1;
+  --card: #ffffff;
+  --card-2: #f7f7f5;
+  --ink: #111111;
+  --ink-2: #4d4d49;
+  --muted: #8d8c86;
+  --line: #ebeae5;
+  --border: rgba(17, 17, 17, 0.07);
+  --olive: #5f6f2e;     /* positive numbers, primary chart series */
+  --maroon: #8c3b3b;    /* blocked / paused numbers */
+  --sky-top: #7cb9e8;   /* shown until sky.webp loads */
+  --good: #0ca30c;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --radius: 28px;
+  --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 12px 40px -12px rgba(40,60,80,.18);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--page); color: var(--ink); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+img, svg, canvas { display: block; }
+
+/* ── nav ─────────────────────────────────────────────────────────── */
+.nav { position: relative; z-index: 5; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 24px 40px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 500; letter-spacing: -0.02em; text-decoration: none; }
+.brand svg { width: 30px; height: 30px; }
+.pillnav { display: inline-flex; gap: 4px; padding: 5px; background: rgba(255,255,255,.92); border-radius: 18px; box-shadow: var(--shadow); }
+.pillnav a { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 13px; color: var(--ink); text-decoration: none; transition: background .15s; }
+.pillnav a:hover { background: var(--card-2); }
+.pillnav a[aria-current="page"] { background: var(--ink); color: #fff; }
+.pillnav svg { width: 18px; height: 18px; }
+.nav .right { justify-self: end; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 52px; padding: 0 26px; border-radius: 14px; font: 500 15px var(--sans); text-decoration: none; border: 0; cursor: pointer; transition: transform .15s, background .15s; }
+.btn:active { transform: translateY(1px); }
+.btn-dark { background: #1d1d1d; color: #fff; box-shadow: 0 8px 24px -10px rgba(0,0,0,.5); }
+.btn-dark:hover { background: #000; }
+.btn-light { background: #fff; color: var(--ink); box-shadow: var(--shadow); }
+.btn-light:hover { background: #fafafa; }
+.btn-sm { height: 40px; padding: 0 16px; border-radius: 11px; font-size: 14px; }
+
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; background: #fff; border-radius: 8px; font-size: 13px; box-shadow: var(--shadow); }
+.badge .mark { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 4px; background: var(--ink); color: #fff; font-size: 10px; font-weight: 600; }
+
+.serif { font-family: var(--serif); font-weight: 400; letter-spacing: -0.035em; line-height: 0.98; }
+
+/* ── sky scene ───────────────────────────────────────────────────── */
+/* Photo sky (sky.webp) under a light haze so headlines stay readable; grass.webp is a cut-out
+   hillside layered in front of cards so they look planted in the grass. */
+.sky { position: relative; overflow: hidden; background: var(--sky-top) url("/sky.webp") center top / cover no-repeat; }
+.sky::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(232,240,246,.28) 0%, rgba(232,240,246,.12) 45%, rgba(240,244,246,.34) 100%); }
+.sky > * { position: relative; }
+.sky > .grass { position: absolute; left: 0; bottom: -1px; width: 100%; height: var(--grass-h, clamp(170px, 21vw, 340px));
+  object-fit: cover; object-position: 70% top; pointer-events: none; z-index: 3; user-select: none; }
+
+/* ── cards ───────────────────────────────────────────────────────── */
+.card { background: var(--card); border-radius: var(--radius); padding: 28px; border: 1px solid var(--border); min-width: 0; }
+.card.inset { background: var(--card-2); border-radius: 18px; padding: 18px; }
+.eyebrow { color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 8px; }
+.stat { font-size: 46px; font-weight: 400; letter-spacing: -0.04em; line-height: 1; }
+.stat-label { font-size: 13px; margin-top: 4px; }
+.olive { color: var(--olive); }
+.maroon { color: var(--maroon); }
+
+/* chat bubbles, used on both pages */
+.chat { display: flex; flex-direction: column; gap: 10px; }
+.bubble { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; font-size: 13.5px; box-shadow: 0 1px 2px rgba(0,0,0,.03); max-width: 92%; overflow-wrap: anywhere; }
+.bubble .who { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; margin-bottom: 2px; }
+.bubble .who small { color: #c3c2bb; font-weight: 400; }
+.bubble.me { align-self: flex-end; background: #fbfbf9; }
+.chip-status { align-self: flex-end; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--olive); }
+.chip-status::before { content: ""; width: 10px; height: 10px; border-radius: 50%; border: 1.5px dashed var(--olive); }
+
+@media (max-width: 720px) {
+  .nav { padding: 16px; grid-template-columns: auto 1fr; }
+  .nav .pillnav { display: none; }
+  .btn { height: 46px; padding: 0 18px; }
+}

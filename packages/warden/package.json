@@ -1,0 +1,29 @@
+{
+  "name": "@warden/warden",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./schema": "./src/memory/schema.ts"
+  },
+  "scripts": {
+    "start": "tsx --env-file-if-exists=../../.env src/main.ts",
+    "spike:memory": "tsx --env-file-if-exists=../../.env src/scripts/spike-memory.ts",
+    "spike:tatum": "tsx --env-file-if-exists=../../.env src/scripts/spike-tatum.ts",
+    "metrics": "tsx --env-file-if-exists=../../.env src/scripts/metrics.ts",
+    "sim": "tsx src/sim/simulate.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@langchain/core": "^1.0.0",
+    "@langchain/langgraph": "^1.0.0",
+    "@mysten-incubation/memwal": "^0.1.9",
+    "@mysten/seal": "^1.1.3",
+    "@mysten/sui": "^2.37.0",
+    "@mysten/walrus": "^1.1.7",
+    "@warden/bot": "workspace:*",
+    "@warden/shared": "workspace:*",
+    "zod": "^3.25.0"
+  }
+}

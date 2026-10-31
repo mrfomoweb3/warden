@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Warden Dashboard</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --surface-2: #f3f2ee;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.10);
+  --series-1: #2a78d6;
+  --good: #0ca30c;
+  --good-ink: #006300;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --bubble-owner: #e3eefb;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --surface-2: #222220; --ink: #f0efec; --ink-2: #c3c2b7;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --series-1: #3987e5;
+    --good-ink: #0ca30c; --bubble-owner: #1d2f45;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --surface-2: #222220; --ink: #f0efec; --ink-2: #c3c2b7;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --series-1: #3987e5;
+  --good-ink: #0ca30c; --bubble-owner: #1d2f45;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 15px; margin: 0 0 2px; }
+.sub { color: var(--ink-2); margin: 0 0 16px; }
+.hint { color: var(--muted); font-size: 12px; margin: 0 0 12px; }
+.badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--ink-2); background: var(--surface); }
+.banner { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--series-1); border-radius: 8px; padding: 10px 14px; margin: 0 0 20px; color: var(--ink-2); }
+.spacer { flex: 1; }
+button.ghost { font: inherit; font-size: 12px; color: var(--ink-2); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+button.ghost:hover { background: var(--surface-2); }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.tile .label { color: var(--ink-2); font-size: 12px; }
+.tile .value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin-top: 2px; }
+.tile .note { color: var(--muted); font-size: 12px; }
+
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-bottom: 16px; }
+@media (max-width: 860px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tile .value { font-size: 24px; } }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; min-width: 0; }
+.card-head { display: flex; align-items: flex-start; gap: 8px; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 12px; padding: 6px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); opacity: 0; transition: opacity .1s; z-index: 2; }
+.tip b { font-weight: 600; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; color: var(--muted); font-weight: 500; font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+td { padding: 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; }
+
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.chip { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); color: var(--ink-2); white-space: nowrap; }
+.chip.learned { border-color: var(--series-1); color: var(--series-1); }
+
+.rules { list-style: none; padding: 0; margin: 0; }
+.rules li { padding: 9px 0; border-bottom: 1px solid var(--grid); display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; }
+.rules li > div { overflow-wrap: anywhere; }
+.rules li.off { opacity: .5; text-decoration: line-through; }
+.rules .id { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.rules .meta { color: var(--muted); font-size: 12px; margin-top: 2px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.list-scroll { max-height: 440px; overflow-y: auto; }
+
+.feed { display: flex; flex-direction: column; gap: 8px; }
+.msg { max-width: 88%; padding: 8px 11px; border-radius: 10px; font-size: 13px; background: var(--surface-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.owner { align-self: flex-end; background: var(--bubble-owner); }
+.msg time { display: block; color: var(--muted); font-size: 11px; margin-top: 3px; }
+.msg code { font-size: 11px; }
+
+.incident { padding: 9px 0; border-bottom: 1px solid var(--grid); display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
+.incident .what { overflow-wrap: anywhere; }
+.incident .meta { color: var(--muted); font-size: 12px; }
+
+.memories { margin: 0; padding: 0; list-style: none; }
+.memories li { font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; padding: 8px 10px; background: var(--surface-2); border-radius: 6px; margin-bottom: 6px; color: var(--ink-2); overflow-wrap: anywhere; }
+.empty { color: var(--muted); padding: 24px 0; text-align: center; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Warden</h1>
+    <span class="badge" id="mode">…</span>
+    <span class="spacer"></span>
+    <span class="hint" id="updated" style="margin:0"></span>
+    <button class="ghost" id="theme" type="button" aria-label="Toggle dark mode">◐ Theme</button>
+  </header>
+  <p class="sub">Spend watchdog for your AI agents' wallets on Sui</p>
+  <div class="banner" id="banner" hidden></div>
+  <div id="error" class="banner" hidden></div>
+
+  <section class="kpis" id="kpis" aria-label="Totals"></section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-head"><div><h2>Questions to you, per day</h2><p class="hint">Escalations sent to the owner. This should fall as Warden learns.</p></div><span class="spacer"></span><button class="ghost" data-toggle="questions" type="button">Table</button></div>
+      <div class="chart" id="questions"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h2>Rules learned, running total</h2><p class="hint">From your replies and plain-English instructions.</p></div><span class="spacer"></span><button class="ghost" data-toggle="rules" type="button">Table</button></div>
+      <div class="chart" id="rulesChart"></div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-bottom:16px">
+    <h2>Agents</h2>
+    <p class="hint">Every agent spends through SpendVault, so Warden can pause it on-chain.</p>
+    <div class="scroll"><table id="agents"></table></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <h2>Rules</h2>
+      <p class="hint">Rules are data. Learned rules override the cautious week-1 defaults.</p>
+      <div class="list-scroll"><ul class="rules" id="rules"></ul></div>
+    </div>
+    <div class="card">
+      <h2 id="feedTitle">Owner channel</h2>
+      <p class="hint" id="feedHint">What Warden sent you and how you answered, newest first.</p>
+      <div class="list-scroll"><div class="feed" id="feed"></div></div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <h2>Incidents</h2>
+      <p class="hint">Everything Warden acted on or asked about, newest first.</p>
+      <div class="list-scroll" id="incidents"></div>
+    </div>
+    <div class="card">
+      <h2>What Walrus Memory holds</h2>
+      <p class="hint">A sample of Warden's memories, in the same words Claude Code reads through the Walrus Memory MCP.</p>
+      <ul class="memories" id="memories"></ul>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const fmt = new Intl.NumberFormat();
+const dayLabel = (d) => new Date(d + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" });
+const when = (iso) => new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) + " UTC";
+const usd = (n) => "$" + (n < 1 ? n.toFixed(3) : n.toFixed(2));
+const tableMode = { questions: false, rules: false };
+let last = null;
+
+// Theme toggle: stamps data-theme so it wins over the OS setting both ways.
+try { const t = localStorage.getItem("warden-theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+$("theme").onclick = () => {
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+  const next = cur === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("warden-theme", next); } catch {}
+};
+document.querySelectorAll("[data-toggle]").forEach((b) => b.onclick = () => {
+  const k = b.dataset.toggle; tableMode[k] = !tableMode[k];
+  b.textContent = tableMode[k] ? "Chart" : "Table";
+  if (last) renderCharts(last);
+});
+
+/** Whole-number axis: 4 ticks with an integer step, so counts never show fractional ticks. */
+function niceMax(v) { const step = Math.max(1, Math.ceil(v / 4)); const p = 10 ** Math.floor(Math.log10(step)); const nice = [1, 2, 3, 5, 10].map((k) => k * p).find((k) => k >= step) ?? step; return nice * 4; }
+
+/** Shared frame: hairline grid, baseline, y ticks, sparse x labels. Returns geometry. */
+function frame(data, max, w = 520, h = 220) {
+  const m = { l: 30, r: 8, t: 12, b: 26 };
+  const iw = w - m.l - m.r, ih = h - m.t - m.b;
+  const x = (i) => m.l + (iw / data.length) * (i + 0.5);
+  const y = (v) => m.t + ih - (v / max) * ih;
+  let g = "";
+  const ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const v = (max / ticks) * i, yy = y(v);
+    g += `<line x1="${m.l}" x2="${w - m.r}" y1="${yy}" y2="${yy}" stroke="${i === 0 ? "var(--axis)" : "var(--grid)"}" stroke-width="1"/>`;
+    g += `<text x="${m.l - 6}" y="${yy + 4}" text-anchor="end">${Number.isInteger(v) ? v : v.toFixed(1)}</text>`;
+  }
+  const every = Math.ceil(data.length / 7);
+  data.forEach((d, i) => { if (i % every === 0) g += `<text x="${x(i)}" y="${h - 8}" text-anchor="middle">${dayLabel(d.day)}</text>`; });
+  return { w, h, m, iw, ih, x, y, g };
+}
+
+function tip(el, html, px, py) {
+  let t = el.querySelector(".tip");
+  if (!t) { t = document.createElement("div"); t.className = "tip"; el.appendChild(t); }
+  if (html == null) { t.style.opacity = 0; return; }
+  t.innerHTML = html; t.style.left = px + "px"; t.style.top = py + "px"; t.style.opacity = 1;
+}
+
+function table(rows, cols) {
+  return `<div class="scroll"><table><thead><tr>${cols.map((c) => `<th class="${c.num ? "num" : ""}">${c.label}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${cols.map((c) => `<td class="${c.num ? "num" : ""}">${c.get(r)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+
+function barChart(el, data) {
+  if (!data.length) { el.innerHTML = `<p class="empty">No days recorded yet.</p>`; return; }
+  const max = niceMax(Math.max(1, ...data.map((d) => d.questions)));
+  const f = frame(data, max);
+  const slot = f.iw / data.length, bw = Math.max(4, Math.min(28, slot - 2));
+  let bars = "", hits = "";
+  data.forEach((d, i) => {
+    const x0 = f.x(i) - bw / 2, y0 = f.y(d.questions), base = f.y(0), hgt = base - y0;
+    if (d.questions > 0) {
+      const r = Math.min(4, hgt, bw / 2);
+      bars += `<path d="M${x0},${base} V${y0 + r} Q${x0},${y0} ${x0 + r},${y0} H${x0 + bw - r} Q${x0 + bw},${y0} ${x0 + bw},${y0 + r} V${base} Z" fill="var(--series-1)"/>`;
+    }
+    if (d.pauses) bars += `<text x="${f.x(i)}" y="${y0 - 6}" text-anchor="middle" style="fill:var(--critical);font-size:12px">⏸</text>`;
+    hits += `<rect x="${f.m.l + slot * i}" y="${f.m.t}" width="${slot}" height="${f.ih}" fill="transparent" data-i="${i}"/>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${f.w} ${f.h}" role="img" aria-label="Questions to owner per day">${f.g}${bars}${hits}</svg>`;
+  const svg = el.querySelector("svg");
+  svg.addEventListener("pointermove", (e) => {
+    const i = e.target.dataset?.i; if (i == null) return tip(el, null);
+    const d = data[i], s = svg.getBoundingClientRect().width / f.w;
+    tip(el, `<b>${dayLabel(d.day)}</b> · ${d.questions} question${d.questions === 1 ? "" : "s"}<br>${fmt.format(d.payments)} payments, ${fmt.format(d.silent)} handled silently${d.pauses ? `<br>⏸ ${d.pauses} agent paused` : ""}`, f.x(+i) * s, f.y(d.questions) * s);
+  });
+  svg.addEventListener("pointerleave", () => tip(el, null));
+}
+
+function stepChart(el, data) {
+  if (!data.length) { el.innerHTML = `<p class="empty">No days recorded yet.</p>`; return; }
+  const max = niceMax(Math.max(1, ...data.map((d) => d.rulesTotal)));
+  const f = frame(data, max);
+  let d = "";
+  data.forEach((p, i) => {
+    const xl = f.x(i) - (f.iw / data.length) / 2, xr = f.x(i) + (f.iw / data.length) / 2, yy = f.y(p.rulesTotal);
+    d += i === 0 ? `M${xl},${yy} H${xr}` : ` V${yy} H${xr}`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${f.w} ${f.h}" role="img" aria-label="Rules learned, running total">${f.g}
+    <path d="${d}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round"/>
+    <line class="xh" y1="${f.m.t}" y2="${f.m.t + f.ih}" stroke="var(--axis)" stroke-width="1" opacity="0"/>
+    <circle class="mk" r="4" fill="var(--series-1)" stroke="var(--surface)" stroke-width="2" opacity="0"/>
+    <rect x="${f.m.l}" y="${f.m.t}" width="${f.iw}" height="${f.ih}" fill="transparent" class="hit"/></svg>`;
+  const svg = el.querySelector("svg"), xh = svg.querySelector(".xh"), mk = svg.querySelector(".mk");
+  svg.addEventListener("pointermove", (e) => {
+    const r = svg.getBoundingClientRect(), s = r.width / f.w;
+    const i = Math.max(0, Math.min(data.length - 1, Math.floor(((e.clientX - r.left) / s - f.m.l) / (f.iw / data.length))));
+    const p = data[i], cx = f.x(i), cy = f.y(p.rulesTotal);
+    xh.setAttribute("x1", cx); xh.setAttribute("x2", cx); xh.setAttribute("opacity", 1);
+    mk.setAttribute("cx", cx); mk.setAttribute("cy", cy); mk.setAttribute("opacity", 1);
+    tip(el, `<b>${dayLabel(p.day)}</b> · ${p.rulesTotal} rule${p.rulesTotal === 1 ? "" : "s"} learned`, cx * s, cy * s);
+  });
+  svg.addEventListener("pointerleave", () => { tip(el, null); xh.setAttribute("opacity", 0); mk.setAttribute("opacity", 0); });
+}
+
+function renderCharts(s) {
+  const cols = [
+    { label: "Day", get: (d) => dayLabel(d.day) },
+    { label: "Payments", num: true, get: (d) => fmt.format(d.payments) },
+    { label: "Silent", num: true, get: (d) => fmt.format(d.silent) },
+    { label: "Questions", num: true, get: (d) => d.questions },
+    { label: "Pauses", num: true, get: (d) => d.pauses },
+    { label: "Rules", num: true, get: (d) => d.rulesTotal },
+  ];
+  if (tableMode.questions) $("questions").innerHTML = table(s.days, cols); else barChart($("questions"), s.days);
+  if (tableMode.rules) $("rulesChart").innerHTML = table(s.days, cols); else stepChart($("rulesChart"), s.days);
+}
+
+const ACTION = {
+  pause: { icon: "⏸", label: "Paused", color: "var(--critical)" },
+  escalate: { icon: "❓", label: "Asked you", color: "var(--warning)" },
+  tighten: { icon: "🔒", label: "Tightened caps", color: "var(--serious)" },
+  allow: { icon: "✓", label: "Allowed", color: "var(--good)" },
+};
+const SOURCE = { default: "default", telegram: "you said", feedback: "learned from your reply", "claude-code": "Claude Code" };
+
+function render(s) {
+  last = s;
+  $("error").hidden = true;
+  $("mode").textContent = s.mode === "simulated" ? "Simulated run" : "Live";
+  $("updated").textContent = s.mode === "simulated" ? `generated ${when(s.generated)}` : `updated ${new Date().toLocaleTimeString()}`;
+  const banner = $("banner");
+  banner.hidden = s.mode !== "simulated";
+  banner.innerHTML = `<b>Simulated run (${s.days.length} days).</b> This is the real Warden engine (rules, learning, memory schema) driven by scripted agents and a scripted owner. The chain, Walrus Memory and Telegram are stand-ins. Run <code>pnpm warden</code> against a deployed vault to see live data.`;
+
+  const t = s.totals, pct = t.payments ? Math.round((100 * t.silent) / t.payments) : 0;
+  $("kpis").innerHTML = [
+    ["Payments watched", fmt.format(t.payments), `${s.agents.length} agents`],
+    ["Handled silently", pct + "%", `${fmt.format(t.silent)} payments`],
+    ["Questions to you", fmt.format(t.questions), s.days.length ? `${s.days.at(-1).questions} on the last day` : ""],
+    ["Pauses", fmt.format(t.pauses), `${t.tightens} cap changes`],
+    ["Rules learned", fmt.format(t.rulesLearned), `${s.rules.filter((r) => r.source === "default").length} defaults`],
+    ["Memories written", fmt.format(t.memoryWrites), t.pendingWrites ? `${t.pendingWrites} queued` : s.mode === "simulated" ? "to the Walrus mock" : "to Walrus Memory"],
+  ].map(([l, v, n]) => `<div class="tile"><div class="label">${l}</div><div class="value">${v}</div><div class="note">${n}</div></div>`).join("");
+
+  renderCharts(s);
+
+  $("agents").innerHTML = s.agents.length ? `<thead><tr><th>Agent</th><th>Status</th><th class="num">Normal spend / day</th><th class="num">Usual counterparties</th><th class="num">Peak calls / hour</th><th class="num">Open questions</th></tr></thead><tbody>${s.agents.map((a) => `<tr>
+      <td><b>${esc(a.agent)}</b></td>
+      <td><span class="status"><span class="dot" style="background:${a.paused ? "var(--critical)" : "var(--good)"}"></span>${a.paused ? "⏸ Paused" : "Active"}</span>${a.dailyCapUsd != null ? `<div class="hint" style="margin:0">today ${usd(a.spentTodayUsd)} of ${usd(a.dailyCapUsd)}</div>` : ""}</td>
+      <td class="num">${a.daysObserved ? usd(a.normalDailyUsd) : "<span class='hint'>learning…</span>"}</td>
+      <td class="num">${a.counterparties}</td>
+      <td class="num">${a.peakPerHour}</td>
+      <td class="num">${a.openIncidents}</td></tr>`).join("")}</tbody>` : `<tbody><tr><td class="empty">No agents seen yet.</td></tr></tbody>`;
+
+  const rules = [...s.rules].sort((a, b) => (a.source === "default") - (b.source === "default") || b.created.localeCompare(a.created));
+  $("rules").innerHTML = rules.map((r) => `<li class="${r.enabled ? "" : "off"}">
+      <span class="id">${esc(r.id.replace("default_", "default"))}</span>
+      <div><div>${esc(r.text)}</div>
+      <div class="meta"><span class="status"><span aria-hidden="true">${ACTION[r.action].icon}</span>${r.action}</span>
+      <span class="chip ${r.source === "feedback" ? "learned" : ""}">${SOURCE[r.source]}</span>
+      ${r.learnedFrom ? `<span>from ${esc(r.learnedFrom)}</span>` : ""}${r.source !== "default" ? `<span>${when(r.created)}</span>` : ""}</div></div></li>`).join("");
+
+  const feed = s.feed;
+  $("feedHint").textContent = s.mode === "simulated" ? "Scripted owner replies in the simulation, newest first." : "Live conversations happen in Telegram.";
+  $("feed").innerHTML = feed.length ? feed.map((m) => `<div class="msg ${m.from}">${esc(m.text.replace(/<[^>]+>/g, ""))}<time>${m.from === "owner" ? "you" : "Warden"} · ${when(m.ts)}</time></div>`).join("") : `<p class="empty">Owner messages appear here in simulated runs. Live, they're in Telegram.</p>`;
+
+  $("incidents").innerHTML = s.incidents.length ? s.incidents.map((i) => {
+    const a = ACTION[i.action];
+    return `<div class="incident"><span aria-hidden="true">${a.icon}</span><div><div class="what">${esc(i.what)}</div>
+      <div class="meta">${a.label} · ${i.status === "open" ? "open" : esc(i.outcome || "resolved")} · ${when(i.created)}</div></div></div>`;
+  }).join("") : `<p class="empty">Nothing yet. Quiet is good.</p>`;
+
+  $("memories").innerHTML = s.memories.map((m) => `<li>${esc(m)}</li>`).join("");
+}
+
+async function refresh() {
+  try {
+    const r = await fetch("/api/state", { cache: "no-store" });
+    const body = await r.json();
+    if (!r.ok) throw new Error(body.error);
+    render(body);
+  } catch (e) {
+    const el = $("error"); el.hidden = false; el.textContent = e.message;
+  }
+}
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

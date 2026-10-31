@@ -1,0 +1,6 @@
+[package]
+name = "spend_vault"
+edition = "2024"
+
+[addresses]
+spend_vault = "0x0"
