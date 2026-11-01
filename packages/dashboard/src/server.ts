@@ -1,12 +1,12 @@
 /**
  * Warden dashboard: one page over Warden's state (the local cache of its Walrus
- * memories). Read-only.
+ * memories). Read-only, except /api/try/*, which proxies "Try Warden" visitors to Warden.
  *
  *   pnpm dashboard          # live: reads .warden/, plus on-chain agent status if the vault is configured
  *   pnpm dashboard:sim      # runs the 14-day simulation, then serves it
  */
 import { readFile } from "node:fs/promises";
-import { createServer } from "node:http";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createChain, readAgents, Units, type SuiNetwork } from "@warden/shared";
@@ -16,6 +16,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const argState = process.argv.indexOf("--state");
 const stateDir = resolve(argState > 0 ? process.argv[argState + 1]! : (process.env.WARDEN_STATE_DIR ?? "../../.warden"));
 const port = Number(process.env.DASHBOARD_PORT ?? 4300);
+const wardenApi = `http://127.0.0.1:${process.env.WARDEN_API_PORT ?? 4310}`;
 
 interface Meta {
   mode: "simulated";
@@ -77,6 +78,8 @@ async function state() {
   return {
     mode: s.meta ? "simulated" : "live",
     generated: s.meta?.generated ?? new Date().toISOString(),
+    // Lets the page label the network and link the vault and every transaction to an explorer. Simulated runs have no chain.
+    chain: s.meta ? null : { network: process.env.SUI_NETWORK ?? "testnet", vaultId: process.env.VAULT_OBJECT_ID ?? null, packageId: process.env.VAULT_PACKAGE_ID ?? null },
     totals: {
       payments: sum("events"),
       silent: sum("auto_handled"),
@@ -106,14 +109,41 @@ async function state() {
       openIncidents: incidents.filter((i) => i.agent === p.agent && i.status === "open").length,
     })),
     rules: rules.map((r) => ({ id: r.id, text: r.text, action: r.action, source: r.source, enabled: r.enabled, created: r.created, learnedFrom: r.learned_from, scope: r.scope })),
-    incidents: incidents.slice(0, 40).map((i) => ({ id: i.id, agent: i.agent, what: i.what, action: i.action, status: i.status, outcome: i.outcome, created: i.created })),
+    incidents: incidents.slice(0, 40).map((i) => ({ id: i.id, agent: i.agent, what: i.what, action: i.action, status: i.status, outcome: i.outcome, created: i.created, tx: i.tx })),
     // Digests are already in the charts; the feed is for the question → reply → rule conversation.
     feed: s.meta?.feed.filter((m) => !m.text.startsWith("📒")).slice(-60).reverse() ?? [],
     memories: [...learned.slice(-4), ...incidents.slice(0, 3), ...s.of("feedback").slice(-3), ...profiles.slice(0, 2)].map(describe),
   };
 }
 
-const PAGES: Record<string, string> = { "/": "landing.html", "/dashboard": "dashboard.html" };
+/** "Try Warden": forwards /api/try/* to Warden's private visitor API on localhost. */
+async function proxyTry(req: IncomingMessage, res: ServerResponse, rest: string): Promise<void> {
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const c of req) {
+    size += (c as Buffer).length;
+    if (size > 8_192) {
+      res.writeHead(413, { "content-type": "application/json" });
+      return void res.end(JSON.stringify({ error: "Request too large." }));
+    }
+    chunks.push(c as Buffer);
+  }
+  try {
+    const r = await fetch(`${wardenApi}/visitor/${rest}`, {
+      method: req.method,
+      headers: { "content-type": "application/json", ...(req.headers.authorization ? { authorization: req.headers.authorization } : {}) },
+      body: req.method === "POST" ? Buffer.concat(chunks) : undefined,
+      signal: AbortSignal.timeout(30_000),
+    });
+    res.writeHead(r.status, { "content-type": "application/json", "cache-control": "no-store" });
+    res.end(await r.text());
+  } catch {
+    res.writeHead(503, { "content-type": "application/json" });
+    res.end(JSON.stringify({ error: "Warden is restarting. Please try again in a minute." }));
+  }
+}
+
+const PAGES: Record<string, string> = { "/": "landing.html", "/dashboard": "dashboard.html", "/try": "try.html" };
 const ASSET_TYPES: Record<string, string> = { css: "text/css; charset=utf-8", webp: "image/webp", svg: "image/svg+xml", woff2: "font/woff2" };
 
 const server = createServer(async (req, res) => {
@@ -124,6 +154,8 @@ const server = createServer(async (req, res) => {
       return res.end(body);
     }
     const path = (req.url ?? "/").split(/[?#]/)[0]!;
+    const tryRoute = /^\/api\/try\/([a-z/]+)$/.exec(path);
+    if (tryRoute && (req.method === "GET" || req.method === "POST")) return await proxyTry(req, res, tryRoute[1]!);
     const page = PAGES[path];
     if (page) {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });

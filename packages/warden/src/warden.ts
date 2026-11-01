@@ -181,6 +181,14 @@ export class Warden {
     }
   }
 
+  /** Labels of the agents Warden has seen in the vault. */
+  agentNames(): string[] {
+    return this.d.memory
+      .list("agent_profile")
+      .map((p) => p.agent)
+      .sort();
+  }
+
   // ─── DECIDE ─────────────────────────────────────────────────────────────
 
   decide(contexts: PaymentContext[]): Assessed[] {

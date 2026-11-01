@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try Warden</title>
+<meta name="description" content="Connect a Sui wallet, name an agent, set a rule in plain English and get Warden's alerts in Telegram.">
+<link rel="stylesheet" href="/theme.css">
+<style>
+.top { border-radius: 0 0 36px 36px; padding-bottom: 150px; }
+.top-copy { position: relative; z-index: 4; text-align: center; padding: 40px 16px 0; }
+.top h1 { font-size: clamp(44px, 6.4vw, 88px); margin: 18px auto 14px; max-width: 13ch; }
+.top .sub { color: var(--ink-2); margin: 0 auto; max-width: 56ch; }
+main { position: relative; z-index: 5; max-width: 860px; margin: -110px auto 0; padding: 0 16px 64px; display: grid; gap: 16px; }
+.card h2 { font-family: var(--serif); font-weight: 400; font-size: 32px; letter-spacing: -0.03em; line-height: 1; margin: 0; }
+.hint { color: var(--muted); font-size: 13.5px; margin: 6px 0 16px; }
+.step { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; }
+.step .n { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--card-2); font-weight: 600; }
+.step.done .n { background: #eef1e4; color: var(--olive); }
+.step.next .n { background: var(--ink); color: #fff; }
+.step.locked { opacity: .5; }
+.step.locked .body > :not(.head) { pointer-events: none; }
+.head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.tag { padding: 2px 9px; border-radius: 999px; font-size: 12px; background: var(--card-2); color: var(--ink-2); }
+.tag.next { background: var(--ink); color: #fff; }
+.tag.done { background: #eef1e4; color: var(--olive); }
+.wallets { display: flex; gap: 8px; flex-wrap: wrap; }
+.wallets img { width: 22px; height: 22px; border-radius: 6px; }
+.field { display: flex; gap: 8px; flex-wrap: wrap; }
+input, select { font: 15px var(--sans); height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); background: #fff; color: var(--ink); min-width: 0; }
+input { flex: 1 1 220px; }
+input:focus, select:focus { outline: 2px solid var(--olive); outline-offset: 1px; }
+.examples { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.chip { all: unset; cursor: pointer; font-size: 12.5px; padding: 6px 11px; border-radius: 999px; background: var(--card-2); color: var(--ink-2); }
+.chip:hover { background: var(--line); }
+.chip:focus-visible { outline: 2px solid var(--olive); }
+.msg { margin-top: 10px; font-size: 13.5px; min-height: 1em; }
+.msg.err { color: var(--maroon); }
+.msg.ok { color: var(--olive); }
+.rules { list-style: none; margin: 14px 0 0; padding: 0; }
+.rules li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.rules li:last-child { border-bottom: 0; }
+.rules .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.rules .id { font: 11.5px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); }
+.rules .def { color: var(--muted); font-size: 13px; }
+.x { all: unset; cursor: pointer; font-size: 12.5px; color: var(--ink-2); padding: 5px 10px; border-radius: 9px; background: var(--card-2); }
+.x:hover { background: var(--line); }
+details.defaults { margin-top: 12px; font-size: 13.5px; color: var(--ink-2); }
+details.defaults summary { cursor: pointer; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; color: var(--muted); font-weight: 400; font-size: 13px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+td { padding: 11px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.scroll { overflow-x: auto; }
+.act { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12.5px; white-space: nowrap; background: var(--card-2); }
+.act.allow { color: var(--olive); }
+.act.escalate { color: #8a6d2b; background: #fbf3df; }
+.act.pause, .act.tighten { color: var(--maroon); background: #f6e6e6; }
+.why { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+a.tx { color: var(--olive); text-decoration: none; border-bottom: 1px solid rgba(95,111,46,.35); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; white-space: nowrap; }
+.empty { color: var(--muted); padding: 18px 0; text-align: center; }
+.note { background: var(--card-2); border-radius: 16px; padding: 14px 16px; font-size: 13.5px; color: var(--ink-2); }
+.who { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+.badge.net { margin-right: 8px; }
+.site-foot { max-width: 860px; margin: 8px auto 0; padding: 24px 24px 56px; display: flex; gap: 24px; flex-wrap: wrap; justify-content: space-between; color: var(--ink-2); font-size: 14px; }
+.site-foot nav { display: flex; gap: 18px; flex-wrap: wrap; }
+.site-foot a { color: var(--ink); text-decoration: none; }
+.site-foot a:hover { color: var(--olive); }
+@media (max-width: 600px) { .step { grid-template-columns: minmax(0, 1fr); } .step .n { display: none; } .card { padding: 22px; } }
+</style>
+</head>
+<body>
+
+<section class="sky top">
+  <nav class="nav">
+    <a class="brand" href="/" aria-label="Warden home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="3" fill="#111"/><rect x="18" y="2" width="12" height="12" rx="6" fill="#111"/><rect x="2" y="18" width="12" height="12" rx="6" fill="#111"/><path d="M18 18h12v5a7 7 0 0 1-7 7h-5z" fill="#111"/></svg>
+      Warden
+    </a>
+    <span></span>
+    <div class="right"><span class="badge net" id="net">Sui testnet</span><a class="btn btn-light btn-sm" href="/dashboard">Dashboard</a></div>
+  </nav>
+  <div class="top-copy">
+    <h1 class="serif">Try Warden on a live agent</h1>
+    <p class="sub">Connect a Sui wallet, name your agent and give Warden a rule in plain English. It checks your rule against the real payments of one of our demo agents, and alerts you in Telegram when one breaks it.</p>
+  </div>
+</section>
+
+<main>
+  <div class="card note" id="shadowNote">
+    <b>Shadow mode.</b> Your rules run on Warden's real policy engine and real testnet payments, but only the vault's owner can pause the real agents. Signing in costs nothing and moves no funds. Your rules are saved to Walrus Memory.
+  </div>
+
+  <div class="card step" id="s1">
+    <div class="n">1</div>
+    <div class="body">
+      <div class="head"><h2>Connect a wallet</h2><span class="tag" id="t1"></span></div>
+      <p class="hint">Any Sui wallet works (Slush, Suiet, Phantom…). You'll sign a short message to prove the address is yours.</p>
+      <div id="connectArea"><div class="wallets" id="wallets"></div></div>
+      <div class="msg" id="m1"></div>
+    </div>
+  </div>
+
+  <div class="card step locked" id="s2">
+    <div class="n">2</div>
+    <div class="body">
+      <div class="head"><h2>Name your agent</h2><span class="tag" id="t2"></span></div>
+      <p class="hint">Pick which demo agent's real payments your rules are checked against.</p>
+      <form class="field" id="agentForm">
+        <input id="agentName" maxlength="32" placeholder="e.g. my-research-bot" aria-label="Agent name" required>
+        <select id="watches" aria-label="Demo agent to watch"></select>
+        <button class="btn btn-dark btn-sm" style="height:48px">Save</button>
+      </form>
+      <div class="msg" id="m2"></div>
+    </div>
+  </div>
+
+  <div class="card step locked" id="s3">
+    <div class="n">3</div>
+    <div class="body">
+      <div class="head"><h2>Set a rule</h2><span class="tag" id="t3"></span></div>
+      <p class="hint">Say it the way you'd tell a person. Warden turns it into a rule it can check.</p>
+      <form class="field" id="ruleForm">
+        <input id="ruleText" maxlength="200" placeholder="Pause it if it pays one address more than 10 times in 5 minutes" aria-label="Rule" required>
+        <button class="btn btn-dark btn-sm" style="height:48px" id="ruleBtn">Add rule</button>
+      </form>
+      <div class="examples" id="examples"></div>
+      <div class="msg" id="m3"></div>
+      <ul class="rules" id="rules"></ul>
+      <details class="defaults"><summary>Week-one defaults that also apply</summary><ul class="rules" id="defaults"></ul></details>
+    </div>
+  </div>
+
+  <div class="card step locked" id="s4">
+    <div class="n">4</div>
+    <div class="body">
+      <div class="head"><h2>See what Warden would do</h2><span class="tag" id="t4"></span></div>
+      <p class="hint" id="replayHint">Your rules, replayed on the agent's latest real payments.</p>
+      <div class="scroll" id="replay"></div>
+    </div>
+  </div>
+
+  <div class="card step locked" id="s5">
+    <div class="n">5</div>
+    <div class="body">
+      <div class="head"><h2>Get alerts in Telegram</h2><span class="tag" id="t5"></span></div>
+      <p class="hint">Link a chat and Warden messages you when a real payment trips your rules. Reply with new rules, or tap "Always allow" to teach it.</p>
+      <div id="tgArea"></div>
+      <div class="msg" id="m5"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <span>Warden · a spend watchdog for AI agents on Sui</span>
+  <nav aria-label="Footer"><a href="/">Home</a><a href="/dashboard">Dashboard</a><a href="https://github.com/mrfomoweb3/warden#readme" target="_blank" rel="noopener">Docs</a><a href="https://github.com/mrfomoweb3/warden/issues" target="_blank" rel="noopener">Contact</a></nav>
+</footer>
+
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const short = (x) => `${x.slice(0, 6)}…${x.slice(-4)}`;
+const usd = (n) => "$" + (n < 1 ? n.toFixed(3) : n.toFixed(2));
+const when = (ms) => new Date(ms).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+const EXAMPLES = [
+  "Ask me before it pays any new address",
+  "Pause it if it pays one address more than 10 times in 5 minutes",
+  "Ask me about any payment over $0.01",
+  "Lower its caps if it spends more than $0.50 in a day",
+];
+const LABEL = { allow: "✓ allow", escalate: "❓ ask you", pause: "⛔ pause", tighten: "🔒 lower caps" };
+
+const store = {
+  get() { try { return sessionStorage.getItem("warden.try") || ""; } catch { return ""; } },
+  set(v) { try { v ? sessionStorage.setItem("warden.try", v) : sessionStorage.removeItem("warden.try"); } catch {} },
+};
+let token = store.get();
+let me = null;
+
+async function api(path, body) {
+  const r = await fetch(`/api/try/${path}`, {
+    method: body ? "POST" : "GET",
+    headers: { "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json().catch(() => ({ error: "Unexpected response." }));
+  if (r.status === 401 && token) { token = ""; store.set(""); me = null; render(); }
+  if (!r.ok) throw new Error(data.error || `Request failed (${r.status})`);
+  return data;
+}
+const say = (id, text, kind = "") => { $(id).className = `msg ${kind}`; $(id).textContent = text; };
+
+// ── step 1: wallet-standard connect + personal-message sign-in ─────────────
+let walletsApi = null;
+async function listWallets() {
+  try {
+    walletsApi = await import("https://cdn.jsdelivr.net/npm/@wallet-standard/app@1.1.0/+esm");
+  } catch {
+    say("m1", "Couldn't load the wallet connector. Check your connection and reload.", "err");
+    return;
+  }
+  const { getWallets } = walletsApi;
+  const w = getWallets();
+  const draw = () => {
+    const sui = w.get().filter((x) => x.features["standard:connect"] && x.features["sui:signPersonalMessage"]);
+    $("wallets").innerHTML = sui.length
+      ? sui.map((x, i) => `<button class="btn btn-dark btn-sm" data-w="${i}">${x.icon ? `<img src="${esc(x.icon)}" alt="">` : ""}Connect ${esc(x.name)}</button>`).join("")
+      : `<p class="hint" style="margin:0">No Sui wallet found in this browser. Install <a href="https://slush.app" target="_blank" rel="noopener">Slush</a> (it works with a Google account), then reload this page.</p>`;
+    $("wallets").querySelectorAll("[data-w]").forEach((b) => (b.onclick = () => signIn(sui[Number(b.dataset.w)])));
+  };
+  draw();
+  w.on("register", draw);
+  w.on("unregister", draw);
+}
+
+async function signIn(wallet) {
+  say("m1", `Waiting for ${wallet.name}…`);
+  try {
+    const { accounts } = await wallet.features["standard:connect"].connect();
+    const account = accounts.find((a) => a.chains.some((c) => c.startsWith("sui:"))) ?? accounts[0];
+    if (!account) throw new Error("The wallet didn't share an account.");
+    const { message } = await api("nonce");
+    say("m1", "Sign the message in your wallet. It's free and moves no funds.");
+    const signed = await wallet.features["sui:signPersonalMessage"].signPersonalMessage({ message: new TextEncoder().encode(message), account, chain: "sui:testnet" });
+    const out = await api("login", { address: account.address, message, signature: signed.signature });
+    token = out.token; store.set(token); me = out.me;
+    say("m1", "");
+    render();
+  } catch (e) {
+    say("m1", /reject|denied|cancel/i.test(e.message) ? "You cancelled the request." : e.message, "err");
+  }
+}
+
+// ── steps 2-5 ─────────────────────────────────────────────────────────────
+$("agentForm").onsubmit = async (e) => {
+  e.preventDefault();
+  try {
+    me = await api("agent", { name: $("agentName").value, watches: $("watches").value });
+    say("m2", "Saved.", "ok");
+    render();
+  } catch (err) { say("m2", err.message, "err"); }
+};
+
+$("ruleForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const text = $("ruleText").value.trim();
+  if (!text) return;
+  $("ruleBtn").disabled = true;
+  say("m3", "Reading your rule…");
+  try {
+    const out = await api("rule", { text });
+    me = out.me;
+    $("ruleText").value = "";
+    say("m3", `Saved ${out.rule.id}: ${out.summary}`, "ok");
+    render();
+  } catch (err) { say("m3", err.message, "err"); }
+  $("ruleBtn").disabled = false;
+};
+$("examples").innerHTML = EXAMPLES.map((x) => `<button class="chip" type="button">${esc(x)}</button>`).join("");
+$("examples").querySelectorAll(".chip").forEach((c) => (c.onclick = () => { $("ruleText").value = c.textContent; $("ruleText").focus(); }));
+
+async function deleteRule(id) {
+  try { me = await api("rule/delete", { id }); say("m3", `Deleted ${id}.`, "ok"); render(); }
+  catch (err) { say("m3", err.message, "err"); }
+}
+
+async function loadReplay() {
+  if (!me) return;
+  try {
+    const { items } = await api("replay");
+    $("replay").innerHTML = items.length
+      ? `<table><thead><tr><th>When</th><th>Payment</th><th class="num">Amount</th><th>Warden would</th></tr></thead><tbody>${items.map((i) => `
+          <tr><td>${esc(when(i.ts))}</td>
+          <td><a class="tx" href="https://suiscan.xyz/${esc(me.network)}/tx/${esc(i.digest)}" target="_blank" rel="noopener" title="View on Suiscan (${esc(me.network)})">${esc(short(i.digest))} ↗</a><div class="why">to ${esc(short(i.counterparty))}</div></td>
+          <td class="num">${esc(usd(i.amountUsd))}</td>
+          <td><span class="act ${esc(i.action)}">${esc(LABEL[i.action] ?? i.action)}</span>${i.why.length ? `<div class="why">${esc(i.why.join("; "))}</div>` : ""}${i.silencedBy.length ? `<div class="why">quiet because of your rule ${esc(i.silencedBy.join(", "))}</div>` : ""}</td></tr>`).join("")}</tbody></table>`
+      : `<p class="empty">No payments from ${esc(me.watches)} since Warden last restarted. They come in every few minutes; this table refreshes on its own.</p>`;
+  } catch (err) { $("replay").innerHTML = `<p class="empty">${esc(err.message)}</p>`; }
+}
+
+async function linkTelegram() {
+  try {
+    const { link } = await api("telegram", {});
+    window.open(link, "_blank", "noopener");
+    say("m5", "Telegram opened. Press Start there, then come back. This page checks every few seconds.");
+    let tries = 0;
+    const poll = setInterval(async () => {
+      tries++;
+      try { me = await api("me"); } catch {}
+      if (me?.telegram.linked || tries > 60) { clearInterval(poll); if (me?.telegram.linked) say("m5", "Linked. Warden will message you there.", "ok"); render(); }
+    }, 5000);
+  } catch (err) { say("m5", err.message, "err"); }
+}
+
+function setStep(n, state, label) {
+  const el = $(`s${n}`);
+  el.classList.toggle("done", state === "done");
+  el.classList.toggle("next", state === "next");
+  el.classList.toggle("locked", state === "locked");
+  $(`t${n}`).className = `tag ${state === "done" ? "done" : state === "next" ? "next" : ""}`;
+  $(`t${n}`).textContent = label ?? (state === "done" ? "Done" : state === "next" ? "Next" : "");
+}
+
+function render() {
+  if (!me) {
+    $("connectArea").hidden = false;
+    setStep(1, "next");
+    for (const n of [2, 3, 4, 5]) setStep(n, "locked");
+    return;
+  }
+  $("connectArea").hidden = true;
+  $("m1").className = "msg";
+  $("m1").innerHTML = `<span class="who">Signed in as <span class="mono">${esc(short(me.address))}</span> <button class="x" type="button" id="signOut">Sign out</button></span>`;
+  $("signOut").onclick = () => { token = ""; store.set(""); me = null; say("m1", ""); render(); };
+  $("net").textContent = `Sui ${me.network}`;
+
+  const named = Boolean(me.agentName);
+  const hasRule = me.rules.length > 0;
+  setStep(1, "done");
+  setStep(2, named ? "done" : "next");
+  setStep(3, !named ? "locked" : hasRule ? "done" : "next");
+  setStep(4, named ? "done" : "locked", named ? "Live" : "");
+  setStep(5, !named ? "locked" : me.telegram.linked ? "done" : hasRule ? "next" : "", me.telegram.linked ? "Linked" : undefined);
+
+  if (document.activeElement !== $("agentName")) $("agentName").value = me.agentName;
+  $("watches").innerHTML = me.agents.length
+    ? me.agents.map((a) => `<option value="${esc(a)}" ${a === me.watches ? "selected" : ""}>watches ${esc(a)}</option>`).join("")
+    : `<option value="">no demo agents yet</option>`;
+
+  $("rules").innerHTML = me.rules.length
+    ? me.rules.map((r) => `<li><div class="grow">${esc(r.text)}<div class="id">${esc(r.id)} · ${esc(r.condition.kind.replaceAll("_", " "))} → ${esc(r.action)}</div></div><button class="x" type="button" data-del="${esc(r.id)}">Delete</button></li>`).join("")
+    : "";
+  $("rules").querySelectorAll("[data-del]").forEach((b) => (b.onclick = () => deleteRule(b.dataset.del)));
+  $("defaults").innerHTML = me.defaults.map((r) => `<li><div class="grow def">${esc(r.text)} → ${esc(r.action)}</div></li>`).join("");
+
+  $("replayHint").textContent = `Your rules plus the defaults, replayed on ${me.watches}'s latest real payments on Sui ${me.network}. Newest first.`;
+  loadReplay();
+
+  $("tgArea").innerHTML = !me.telegram.available
+    ? `<p class="hint">Telegram alerts aren't switched on for this server.</p>`
+    : me.telegram.linked
+      ? `<p style="margin:0">✅ Linked. Send <span class="mono">/rules</span> or <span class="mono">/stop</span> in the chat any time.</p>`
+      : `<button class="btn btn-dark btn-sm" type="button" id="tgBtn">Connect Telegram</button>`;
+  if ($("tgBtn")) $("tgBtn").onclick = linkTelegram;
+}
+
+render();
+listWallets();
+if (token) api("me").then((v) => { me = v; render(); }).catch(() => render());
+setInterval(() => me && loadReplay(), 30_000);
+</script>
+</body>
+</html>
