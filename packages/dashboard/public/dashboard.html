@@ -96,7 +96,7 @@ a.tx:hover { border-bottom-color: var(--olive); }
       <a href="#memory" aria-label="Memory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></a>
       <a href="#agents" aria-label="Agents"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6z"/></svg></a>
     </div>
-    <div class="right"><span class="badge net" id="net" hidden></span><span class="badge" id="mode">…</span></div>
+    <div class="right"><span class="badge net" id="net" hidden></span><span class="badge" id="mode">…</span> <a class="btn btn-dark btn-sm" href="/try" style="margin-left:8px">Try Warden</a></div>
   </nav>
   <div class="top-copy">
     <h1 class="serif">Your agents, quietly watched</h1>
@@ -180,7 +180,7 @@ a.tx:hover { border-bottom-color: var(--olive); }
     <details><summary>Which network is this?</summary><p>Sui testnet. Every payment and pause on this page links to Suiscan, so you can check it on-chain. Walrus Memory writes go to mainnet.</p></details>
   </div>
   <nav class="foot-links" aria-label="Footer">
-    <div><h3>Warden</h3><a href="/">Home</a><a href="/dashboard">Dashboard</a><a href="https://t.me/usewarden_bot" target="_blank" rel="noopener">Telegram bot</a></div>
+    <div><h3>Warden</h3><a href="/">Home</a><a href="/try">Try Warden</a><a href="/dashboard">Dashboard</a><a href="https://t.me/usewarden_bot" target="_blank" rel="noopener">Telegram bot</a></div>
     <div><h3>Docs</h3><a href="https://github.com/mrfomoweb3/warden#readme" target="_blank" rel="noopener">README</a><a href="https://github.com/mrfomoweb3/warden" target="_blank" rel="noopener">Source code</a><a href="https://youtu.be/2kqzJp-XJmU" target="_blank" rel="noopener">Demo video</a></div>
     <div><h3>Contact</h3><a href="https://github.com/mrfomoweb3/warden/issues" target="_blank" rel="noopener">Open an issue</a><span id="footVault"></span></div>
   </nav>
@@ -356,7 +356,7 @@ function render(s) {
       ${r.learnedFrom ? `<span>from ${esc(r.learnedFrom)}</span>` : ""}${r.source !== "default" ? `<span>${when(r.created)}</span>` : ""}</div></div></li>`).join("");
 
   $("feedHint").textContent = s.mode === "simulated" ? "Scripted owner replies in the simulation, newest first." : "Live conversations happen in Telegram.";
-  $("feed").innerHTML = s.feed.length ? s.feed.map((m) => `<div class="bubble ${m.from === "owner" ? "me" : ""}"><div class="who">${m.from === "owner" ? "You" : "Warden"}</div>${linkify(esc(m.text.replace(/<[^>]+>/g, "")))}<time>${when(m.ts)}</time></div>`).join("") : `<p class="empty">Owner messages appear here in simulated runs. Live, they're in Telegram.</p>`;
+  $("feed").innerHTML = s.feed.length ? s.feed.map((m) => `<div class="bubble ${m.from === "owner" ? "me" : ""}"><div class="who">${m.from === "owner" ? "You" : "Warden"}</div>${linkify(esc(m.text.replace(/<[^>]+>/g, "")))}<time>${when(m.ts)}</time></div>`).join("") : (s.mode === "simulated" ? `<p class="empty">Owner messages appear here in simulated runs.</p>` : `<div class="empty"><p style="margin:0 0 14px">The owner talks to Warden in a private Telegram chat. Want your own? Set a rule on a live agent and Warden will message you.</p><a class="btn btn-dark btn-sm" href="/try">Try Warden</a></div>`);
 
   $("incidents").innerHTML = s.incidents.length ? s.incidents.map((i) => {
     const a = ACTION[i.action];

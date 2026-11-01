@@ -21,6 +21,7 @@
   --grass-k: .55; /* how high the hill line sits behind the card, as a fraction of --grass-h */ }
 .hero-copy { position: relative; z-index: 4; text-align: center; padding: clamp(20px, 5vh, 64px) 16px 0; }
 .hero h1 { font-size: clamp(52px, min(8.6vw, 12vh), 132px); margin: clamp(10px, 2vh, 24px) auto clamp(12px, 2vh, 22px); max-width: 13ch; }
+.ctas { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .hero .lede { max-width: 600px; margin: 0 auto clamp(14px, 2.4vh, 26px); color: var(--ink-2); font-size: clamp(15px, 1.9vh, 17px); }
 
 /* product card planted on the hill: its bottom edge sits on the grass line, pushed 15% of its own height into the grass */
@@ -213,13 +214,13 @@
       <a href="#how">How it works</a>
       <a href="#tech">Tech</a>
     </div>
-    <div class="right"><a class="btn btn-light btn-sm" href="/dashboard">Open dashboard</a></div>
+    <div class="right"><a class="btn btn-dark btn-sm" href="/try">Try Warden</a></div>
   </nav>
 
   <div class="hero-copy">
     <h1 class="serif">Autopilot for your agents' wallets.</h1>
     <p class="lede">Warden watches every payment your AI agents make on Sui, learns what's normal, and stops what isn't. It only asks you when it matters.</p>
-    <a class="btn btn-dark" href="/dashboard">Open the dashboard</a>
+    <div class="ctas"><a class="btn btn-dark" href="/try">Try Warden</a><a class="btn btn-light" href="/dashboard">Open the dashboard</a></div>
   </div>
 
   <div class="stage">
@@ -409,8 +410,8 @@
 
 <section class="sky cta">
   <h2 class="serif">Give your agents a watchdog.</h2>
-  <p>See every agent, every rule Warden has learned, and every time it stepped in.</p>
-  <a class="btn btn-dark" href="/dashboard">Open the dashboard</a>
+  <p>Connect a Sui wallet, name your agent and set a rule in plain English. Warden checks it against live testnet payments and alerts you in Telegram.</p>
+  <div class="ctas"><a class="btn btn-dark" href="/try">Try Warden</a><a class="btn btn-light" href="/dashboard">Open the dashboard</a></div>
   <img class="grass" src="/grass.webp" alt="" aria-hidden="true">
 </section>
 
@@ -424,7 +425,7 @@
       <p>A spend watchdog for AI agents on Sui. Learns what's normal, stops what isn't, remembers everything.</p>
     </div>
     <nav class="foot-cols" aria-label="Footer">
-      <div><h4>Product</h4><a href="/dashboard">Dashboard</a><a href="#how">How it works</a><a href="#results">Results</a></div>
+      <div><h4>Product</h4><a href="/try">Try Warden</a><a href="/dashboard">Dashboard</a><a href="#how">How it works</a><a href="#results">Results</a></div>
       <div><h4>Learn</h4><a href="#problem">The problem</a><a href="#solution">The solution</a><a href="#tech">The tech</a></div>
       <div><h4>Docs &amp; contact</h4><a href="https://github.com/mrfomoweb3/warden#readme" target="_blank" rel="noopener">README</a><a href="https://github.com/mrfomoweb3/warden" target="_blank" rel="noopener">Source code</a><a href="https://youtu.be/2kqzJp-XJmU" target="_blank" rel="noopener">Demo video</a><a href="https://github.com/mrfomoweb3/warden/issues" target="_blank" rel="noopener">Open an issue</a></div>
       <div><h4>Built with</h4><span>Tatum Sui gateway</span><span>Walrus Memory</span><span>Sui · Move</span><span>x402</span></div>
