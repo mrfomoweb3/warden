@@ -1,0 +1,60 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif.woff2") format("woff2"); font-weight: 400; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #111; }
+    #end-sky { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    #end-grass { position: absolute; left: 0; bottom: -2px; width: 1920px; height: 300px; object-fit: cover; object-position: 70% top; }
+    #end-stage { position: absolute; inset: 0; }
+    .end-claim { position: absolute; left: 0; width: 1920px; text-align: center; font: 400 150px/1 "Instrument Serif", serif; letter-spacing: -0.035em; }
+    #end-c1 { top: 300px; }
+    #end-c2 { top: 470px; }
+    #end-c2 em { font-style: normal; color: #5f6f2e; }
+    #end-lockup { position: absolute; left: 600px; top: 300px; width: 720px; height: 240px; }
+    #end-mark { position: absolute; left: 0; top: 10px; width: 220px; height: 220px; }
+    .end-s { position: absolute; width: 82.5px; height: 82.5px; background: #111; }
+    #end-s1 { left: 13.75px; top: 13.75px; border-radius: 20.6px; }
+    #end-s2 { left: 123.75px; top: 13.75px; border-radius: 41.25px; }
+    #end-s3 { left: 13.75px; top: 123.75px; border-radius: 41.25px; }
+    #end-s4 { left: 123.75px; top: 123.75px; border-radius: 0 0 48px 0; }
+    #end-word { position: absolute; left: 270px; top: 20px; font: 400 200px/1 "Instrument Serif", serif; letter-spacing: -0.035em; }
+    #end-cta { position: absolute; left: 0; width: 1920px; top: 610px; display: flex; justify-content: center; gap: 24px; }
+    .end-btn { padding: 22px 34px; border-radius: 20px; font: 600 40px Inter, sans-serif; }
+    #end-b1 { background: #1d1d1d; color: #fff; }
+    #end-b2 { background: #fff; color: #111; box-shadow: 0 14px 34px rgba(30, 50, 70, 0.18); }
+    #end-built { position: absolute; left: 0; width: 1920px; top: 740px; text-align: center; font: 500 34px Inter, sans-serif; color: #2b2b28; }
+    #end-lockup, #end-cta, #end-built { opacity: 0; }
+  </style>
+  <div data-hf-id="hf-gwfo" id="root" data-composition-id="end" data-width="1920" data-height="1080">
+    <img data-hf-id="hf-lq68" id="end-sky" class="clip" src="assets/img/sky.webp" data-start="0" data-duration="7.6" data-track-index="0" alt="" />
+    <div data-hf-id="hf-red8" id="end-stage" class="clip" data-start="0" data-duration="7.6" data-track-index="1">
+      <div data-hf-id="hf-fbbn" class="end-claim" id="end-c1">Your agents can spend.</div>
+      <div data-hf-id="hf-x3a2" class="end-claim" id="end-c2">Warden <em data-hf-id="hf-ejpi">watches</em>.</div>
+      <div data-hf-id="hf-u2tv" id="end-lockup">
+        <div data-hf-id="hf-d956" id="end-mark"><div data-hf-id="hf-bnch" class="end-s" id="end-s1"></div><div data-hf-id="hf-flgi" class="end-s" id="end-s2"></div><div data-hf-id="hf-jjkj" class="end-s" id="end-s3"></div><div data-hf-id="hf-w230" class="end-s" id="end-s4"></div></div>
+        <div data-hf-id="hf-kfzo" id="end-word">Warden</div>
+      </div>
+      <div data-hf-id="hf-cng5" id="end-cta"><div data-hf-id="hf-01xz" class="end-btn" id="end-b1">usewarden.fly.dev</div><div data-hf-id="hf-w0fc" class="end-btn" id="end-b2">github.com/mrfomoweb3/warden</div></div>
+      <div data-hf-id="hf-jjzj" id="end-built">Built on Sui · Tatum · Walrus Memory</div>
+    </div>
+    <img data-hf-id="hf-6zwk" id="end-grass" class="clip" src="assets/img/grass.webp" data-start="0" data-duration="7.6" data-track-index="2" alt="" />
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#end-grass", { y: 300 }, { y: 0, duration: 0.8, ease: "power3.out" }, 0);
+    // The claim: "Your agents can spend." (0.7 s) / "Warden watches." (2.4 s)
+    tl.fromTo("#end-c1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.65);
+    tl.fromTo("#end-c2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 2.35);
+    tl.to(["#end-c1", "#end-c2"], { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, 3.5);
+    // The mark is carried in: its four shapes arrive from the four corners and lock together.
+    tl.to("#end-lockup", { opacity: 1, duration: 0.01 }, 3.7);
+    tl.fromTo("#end-s1", { x: -500, y: -400, rotation: -90 }, { x: 0, y: 0, rotation: 0, duration: 0.55, ease: "power3.out" }, 3.7);
+    tl.fromTo("#end-s2", { x: 500, y: -400, rotation: 90 }, { x: 0, y: 0, rotation: 0, duration: 0.55, ease: "power3.out" }, 3.78);
+    tl.fromTo("#end-s3", { x: -500, y: 400, rotation: 90 }, { x: 0, y: 0, rotation: 0, duration: 0.55, ease: "power3.out" }, 3.86);
+    tl.fromTo("#end-s4", { x: 500, y: 400, rotation: -90 }, { x: 0, y: 0, rotation: 0, duration: 0.55, ease: "power3.out" }, 3.94);
+    // Wordmark wipes in beside it.
+    tl.fromTo("#end-word", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.5, ease: "power3.inOut" }, 4.45);
+    tl.fromTo("#end-cta", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 4.95);
+    tl.fromTo("#end-built", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.2);
+    window.__timelines["end"] = tl;
+  </script>
+</template>

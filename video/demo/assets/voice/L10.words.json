@@ -1,0 +1,140 @@
+[
+  {
+    "id": "w0",
+    "text": "The",
+    "start": 0.299,
+    "end": 0.4267
+  },
+  {
+    "id": "w1",
+    "text": "agent",
+    "start": 0.469,
+    "end": 0.768
+  },
+  {
+    "id": "w2",
+    "text": "keeps",
+    "start": 0.811,
+    "end": 1.024
+  },
+  {
+    "id": "w3",
+    "text": "trying.",
+    "start": 1.067,
+    "end": 1.664
+  },
+  {
+    "id": "w4",
+    "text": "The",
+    "start": 2.005,
+    "end": 2.0907
+  },
+  {
+    "id": "w5",
+    "text": "vault",
+    "start": 2.133,
+    "end": 2.261
+  },
+  {
+    "id": "w6",
+    "text": "refuses,",
+    "start": 2.304,
+    "end": 2.88
+  },
+  {
+    "id": "w7",
+    "text": "sixty-nine",
+    "start": 3.115,
+    "end": 3.669
+  },
+  {
+    "id": "w8",
+    "text": "times,",
+    "start": 3.755,
+    "end": 4.117
+  },
+  {
+    "id": "w9",
+    "text": "and",
+    "start": 4.267,
+    "end": 4.5227
+  },
+  {
+    "id": "w10",
+    "text": "moves",
+    "start": 4.565,
+    "end": 4.736
+  },
+  {
+    "id": "w11",
+    "text": "nothing.",
+    "start": 4.821,
+    "end": 5.419
+  },
+  {
+    "id": "w12",
+    "text": "That's",
+    "start": 5.845,
+    "end": 6.016
+  },
+  {
+    "id": "w13",
+    "text": "a",
+    "start": 6.059,
+    "end": 6.101
+  },
+  {
+    "id": "w14",
+    "text": "real",
+    "start": 6.144,
+    "end": 6.357
+  },
+  {
+    "id": "w15",
+    "text": "transaction",
+    "start": 6.443,
+    "end": 6.869
+  },
+  {
+    "id": "w16",
+    "text": "on",
+    "start": 7.04,
+    "end": 7.125
+  },
+  {
+    "id": "w17",
+    "text": "Sui,",
+    "start": 7.168,
+    "end": 7.616
+  },
+  {
+    "id": "w18",
+    "text": "signed",
+    "start": 7.808,
+    "end": 8.149
+  },
+  {
+    "id": "w19",
+    "text": "by",
+    "start": 8.192,
+    "end": 8.32
+  },
+  {
+    "id": "w20",
+    "text": "Warden's",
+    "start": 8.363,
+    "end": 8.7467
+  },
+  {
+    "id": "w21",
+    "text": "own",
+    "start": 8.789,
+    "end": 8.917
+  },
+  {
+    "id": "w22",
+    "text": "key.",
+    "start": 9.003,
+    "end": 9.284580498866212
+  }
+]

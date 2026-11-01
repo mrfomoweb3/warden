@@ -8,11 +8,13 @@ Warden watches every payment your AI agents make on Sui, learns what normal look
 
 ## Demo
 
-> 🎥 Demo video: _add link_
+> 🎥 Demo video (1:44): [youtu.be/2kqzJp-XJmU](https://youtu.be/2kqzJp-XJmU)
 >
 > 🌐 Live: [usewarden.fly.dev](https://usewarden.fly.dev) (landing page) · [usewarden.fly.dev/dashboard](https://usewarden.fly.dev/dashboard) (live dashboard)
 >
 > 🤖 Telegram bot: [@usewarden_bot](https://t.me/usewarden_bot) (answers only the owner's chat during the testnet run)
+
+[![Watch the Warden demo video on YouTube](https://img.youtube.com/vi/2kqzJp-XJmU/maxresdefault.jpg)](https://youtu.be/2kqzJp-XJmU)
 
 ![Warden live dashboard: 41 payments watched, 27 memories on Walrus, rogue agent paused on-chain](docs/dashboard.png)
 

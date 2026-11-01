@@ -1,0 +1,46 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif.woff2") format("woff2"); font-weight: 400; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #111; }
+    #reveal-day, #reveal-night { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    #reveal-grass { position: absolute; left: 0; bottom: -2px; width: 1920px; height: 260px; object-fit: cover; object-position: 70% top; }
+    #reveal-phone { position: absolute; left: 1210px; top: 150px; width: 470px; height: 820px; background: #0d0d0d; border-radius: 64px; padding: 18px;
+      box-shadow: 0 30px 80px rgba(20, 40, 60, 0.35); }
+    #reveal-phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 48px; }
+    #reveal-copy { position: absolute; left: 130px; top: 300px; width: 1000px; }
+    #reveal-mark { width: 120px; height: 120px; }
+    #reveal-name { margin-top: 26px; font: 400 168px/0.9 "Instrument Serif", serif; letter-spacing: -0.035em; }
+    #reveal-tag { margin-top: 26px; font: 500 44px/1.25 Inter, sans-serif; color: #2b2b28; max-width: 900px; }
+    #reveal-sui { margin-top: 28px; display: inline-block; padding: 12px 22px; background: #fff; border-radius: 14px; font: 600 32px Inter, sans-serif;
+      box-shadow: 0 12px 30px rgba(30, 50, 70, 0.18); }
+  </style>
+  <div data-hf-id="hf-yqoq" id="root" data-composition-id="reveal" data-width="1920" data-height="1080">
+    <img data-hf-id="hf-wgbm" id="reveal-day" class="clip" src="assets/img/sky.webp" data-start="0" data-duration="6.2" data-track-index="0" alt="">
+    <img data-color-grading="{&quot;preset&quot;:null,&quot;intensity&quot;:1,&quot;adjust&quot;:{&quot;exposure&quot;:-1.7,&quot;contrast&quot;:0,&quot;highlights&quot;:0,&quot;shadows&quot;:0,&quot;whites&quot;:0,&quot;blacks&quot;:0,&quot;temperature&quot;:-0.4,&quot;tint&quot;:0,&quot;vibrance&quot;:0,&quot;saturation&quot;:-0.35},&quot;details&quot;:{&quot;vignette&quot;:0.1,&quot;vignetteMidpoint&quot;:0.5,&quot;vignetteRoundness&quot;:0,&quot;vignetteFeather&quot;:0.65,&quot;grain&quot;:0,&quot;grainSize&quot;:0.25,&quot;grainRoughness&quot;:0.5},&quot;effects&quot;:{&quot;blur&quot;:0,&quot;pixelate&quot;:0,&quot;chromaBleed&quot;:0,&quot;tapeDamage&quot;:0,&quot;tapeTracking&quot;:0,&quot;tapeNoise&quot;:1,&quot;tapeSpeed&quot;:0.5,&quot;filmArtifacts&quot;:0,&quot;halftone&quot;:0,&quot;halftoneSize&quot;:0,&quot;twoInkPrint&quot;:0,&quot;twoInkPrintSize&quot;:0,&quot;ascii&quot;:0,&quot;asciiSize&quot;:0.06578947368421052,&quot;asciiInvert&quot;:0,&quot;asciiStyle&quot;:0,&quot;asciiColor&quot;:1,&quot;asciiRotation&quot;:0,&quot;dither&quot;:0,&quot;ditherSize&quot;:0,&quot;bloom&quot;:0,&quot;bloomRadius&quot;:8,&quot;monoScreen&quot;:0,&quot;monoScreenSize&quot;:0,&quot;monoScreenAngle&quot;:0,&quot;monoScreenSpread&quot;:0,&quot;monoScreenShape&quot;:0,&quot;monoScreenInvert&quot;:0,&quot;scanlines&quot;:0,&quot;scanlineCount&quot;:0,&quot;scanlineSoftness&quot;:0,&quot;chromaticAberration&quot;:0,&quot;chromaticAngle&quot;:0,&quot;crtCurvature&quot;:0,&quot;digitalGlitch&quot;:0,&quot;digitalGlitchColorSplit&quot;:0,&quot;digitalGlitchLineTear&quot;:0,&quot;digitalGlitchPixelate&quot;:0,&quot;digitalGlitchBlockAmount&quot;:0,&quot;digitalGlitchBlockDisplacement&quot;:0,&quot;digitalGlitchBlockOpacity&quot;:0,&quot;digitalGlitchSpeed&quot;:0,&quot;engraving&quot;:0,&quot;engravingSpacing&quot;:0.4117647058823529,&quot;engravingMinThickness&quot;:0.2,&quot;engravingMaxThickness&quot;:0.4571428571428572,&quot;engravingAngle&quot;:0.25,&quot;engravingContrast&quot;:0.4666666666666667,&quot;engravingSharpness&quot;:0.59,&quot;engravingWave&quot;:0.2,&quot;engravingWaveFrequency&quot;:0.2222222222222222,&quot;crosshatch&quot;:0,&quot;crosshatchSpacing&quot;:0.28,&quot;crosshatchThickness&quot;:0.25,&quot;crosshatchAngle&quot;:0.25,&quot;crosshatchContrast&quot;:0.3333333333333333,&quot;crosshatchEdges&quot;:0.5,&quot;crosshatchLineWeight&quot;:0,&quot;crosshatchWave&quot;:0.33,&quot;crosshatchWaveFrequency&quot;:0.2222222222222222,&quot;kuwahara&quot;:0,&quot;kuwaharaRadius&quot;:0.14285714285714285,&quot;kuwaharaSharpness&quot;:0.3125,&quot;kuwaharaSaturation&quot;:0.5},&quot;lut&quot;:null,&quot;colorSpace&quot;:&quot;rec709&quot;}" data-hf-id="hf-9ezz" id="reveal-night" class="clip" src="assets/img/sky.webp" data-start="0" data-duration="1.5" data-track-index="1" alt="">
+    <img data-hf-id="hf-wg6z" id="reveal-grass" class="clip" src="assets/img/grass.webp" data-start="0" data-duration="6.2" data-track-index="2" alt="">
+    <div data-hf-id="hf-2r75" id="reveal-stage" class="clip" data-start="0" data-duration="6.2" data-track-index="3" style="position:absolute;inset:0">
+      <div data-hf-id="hf-s16t" id="reveal-phone"><img data-hf-id="hf-we97" src="assets/img/telegram-bot.png" alt="The Warden bot in Telegram"></div>
+      <div data-hf-id="hf-gejg" id="reveal-copy">
+        <img data-hf-id="hf-5aj6" id="reveal-mark" src="assets/img/warden-mark.svg" alt="">
+        <div data-hf-id="hf-cgwn" id="reveal-name">Warden</div>
+        <div data-hf-id="hf-j8pw" id="reveal-tag">A watchdog for the wallets your agents spend from.</div>
+        <div data-hf-id="hf-9j3q" id="reveal-sui">on Sui</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // The buzzing phone from the 2 a.m. scenes rises into frame.
+    tl.fromTo("#reveal-phone", { y: 700, rotation: 6 }, { y: 0, rotation: 0, duration: 0.6, ease: "power3.out" }, 0);
+    // Colour flood: night to day, on "Warden" (1.0 s).
+    tl.fromTo("#reveal-night", { opacity: 1 }, { opacity: 0, duration: 0.45, ease: "power2.inOut" }, 0.85);
+    tl.fromTo("#reveal-mark", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.6)", transformOrigin: "left center" }, 0.9);
+    tl.fromTo("#reveal-name", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 1.0);
+    tl.fromTo("#reveal-tag", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 1.95);
+    tl.fromTo("#reveal-sui", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.8)", transformOrigin: "left center" }, 4.9);
+    // Zoom through the phone into the next scene.
+    tl.to("#reveal-phone", { scale: 2.6, x: -380, opacity: 0, duration: 0.45, ease: "power2.in" }, 5.75);
+    tl.to("#reveal-copy", { opacity: 0, filter: "blur(8px)", duration: 0.25, ease: "power2.in" }, 5.8);
+    window.__timelines["reveal"] = tl;
+  </script>
+</template>

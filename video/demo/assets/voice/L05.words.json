@@ -1,0 +1,116 @@
+[
+  {
+    "id": "w0",
+    "text": "Your",
+    "start": 0.256,
+    "end": 0.4267
+  },
+  {
+    "id": "w1",
+    "text": "agents",
+    "start": 0.512,
+    "end": 0.8107
+  },
+  {
+    "id": "w2",
+    "text": "don't",
+    "start": 0.896,
+    "end": 1.0667
+  },
+  {
+    "id": "w3",
+    "text": "pay",
+    "start": 1.109,
+    "end": 1.323
+  },
+  {
+    "id": "w4",
+    "text": "from",
+    "start": 1.408,
+    "end": 1.493
+  },
+  {
+    "id": "w5",
+    "text": "their",
+    "start": 1.536,
+    "end": 1.664
+  },
+  {
+    "id": "w6",
+    "text": "own",
+    "start": 1.707,
+    "end": 1.792
+  },
+  {
+    "id": "w7",
+    "text": "wallets.",
+    "start": 1.877,
+    "end": 2.517
+  },
+  {
+    "id": "w8",
+    "text": "They",
+    "start": 2.859,
+    "end": 2.944
+  },
+  {
+    "id": "w9",
+    "text": "spend",
+    "start": 3.029,
+    "end": 3.285
+  },
+  {
+    "id": "w10",
+    "text": "through",
+    "start": 3.371,
+    "end": 3.541
+  },
+  {
+    "id": "w11",
+    "text": "SpendVault,",
+    "start": 3.584,
+    "end": 4.352
+  },
+  {
+    "id": "w12",
+    "text": "a",
+    "start": 4.565,
+    "end": 4.6507
+  },
+  {
+    "id": "w13",
+    "text": "Move",
+    "start": 4.693,
+    "end": 4.864
+  },
+  {
+    "id": "w14",
+    "text": "contract",
+    "start": 4.992,
+    "end": 5.1627
+  },
+  {
+    "id": "w15",
+    "text": "Warden",
+    "start": 5.547,
+    "end": 5.9307
+  },
+  {
+    "id": "w16",
+    "text": "can",
+    "start": 5.973,
+    "end": 6.101
+  },
+  {
+    "id": "w17",
+    "text": "pause",
+    "start": 6.144,
+    "end": 6.485
+  },
+  {
+    "id": "w18",
+    "text": "on-chain.",
+    "start": 6.613,
+    "end": 7.3087074829931975
+  }
+]

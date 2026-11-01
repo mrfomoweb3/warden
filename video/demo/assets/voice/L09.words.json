@@ -1,0 +1,140 @@
+[
+  {
+    "id": "w0",
+    "text": "Back",
+    "start": 0.299,
+    "end": 0.469
+  },
+  {
+    "id": "w1",
+    "text": "to",
+    "start": 0.512,
+    "end": 0.597
+  },
+  {
+    "id": "w2",
+    "text": "two",
+    "start": 0.64,
+    "end": 0.8107
+  },
+  {
+    "id": "w3",
+    "text": "a.m.",
+    "start": 0.853,
+    "end": 1.408
+  },
+  {
+    "id": "w4",
+    "text": "Thirty",
+    "start": 1.664,
+    "end": 1.92
+  },
+  {
+    "id": "w5",
+    "text": "payments",
+    "start": 2.048,
+    "end": 2.3467
+  },
+  {
+    "id": "w6",
+    "text": "to",
+    "start": 2.432,
+    "end": 2.517
+  },
+  {
+    "id": "w7",
+    "text": "the",
+    "start": 2.56,
+    "end": 2.6027
+  },
+  {
+    "id": "w8",
+    "text": "same",
+    "start": 2.645,
+    "end": 2.8587
+  },
+  {
+    "id": "w9",
+    "text": "API",
+    "start": 2.944,
+    "end": 3.3707
+  },
+  {
+    "id": "w10",
+    "text": "in",
+    "start": 3.499,
+    "end": 3.6267
+  },
+  {
+    "id": "w11",
+    "text": "ten",
+    "start": 3.669,
+    "end": 3.8827
+  },
+  {
+    "id": "w12",
+    "text": "minutes.",
+    "start": 3.968,
+    "end": 4.373
+  },
+  {
+    "id": "w13",
+    "text": "Warden",
+    "start": 4.693,
+    "end": 5.0347
+  },
+  {
+    "id": "w14",
+    "text": "pauses",
+    "start": 5.077,
+    "end": 5.333
+  },
+  {
+    "id": "w15",
+    "text": "the",
+    "start": 5.504,
+    "end": 5.632
+  },
+  {
+    "id": "w16",
+    "text": "agent",
+    "start": 5.675,
+    "end": 5.973
+  },
+  {
+    "id": "w17",
+    "text": "on-chain.",
+    "start": 6.016,
+    "end": 6.656
+  },
+  {
+    "id": "w18",
+    "text": "No",
+    "start": 6.869,
+    "end": 7.0827
+  },
+  {
+    "id": "w19",
+    "text": "confirm",
+    "start": 7.125,
+    "end": 7.4667
+  },
+  {
+    "id": "w20",
+    "text": "button.",
+    "start": 7.595,
+    "end": 7.893
+  },
+  {
+    "id": "w21",
+    "text": "No",
+    "start": 8.064,
+    "end": 8.277
+  },
+  {
+    "id": "w22",
+    "text": "human.",
+    "start": 8.363,
+    "end": 8.748
+  }
+]

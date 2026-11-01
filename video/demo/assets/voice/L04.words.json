@@ -1,0 +1,86 @@
+[
+  {
+    "id": "w0",
+    "text": "This",
+    "start": 0.299,
+    "end": 0.4267
+  },
+  {
+    "id": "w1",
+    "text": "is",
+    "start": 0.469,
+    "end": 0.5547
+  },
+  {
+    "id": "w2",
+    "text": "Warden.",
+    "start": 0.597,
+    "end": 1.216
+  },
+  {
+    "id": "w3",
+    "text": "A",
+    "start": 1.408,
+    "end": 1.536
+  },
+  {
+    "id": "w4",
+    "text": "watchdog",
+    "start": 1.579,
+    "end": 2.133
+  },
+  {
+    "id": "w5",
+    "text": "for",
+    "start": 2.261,
+    "end": 2.389
+  },
+  {
+    "id": "w6",
+    "text": "the",
+    "start": 2.432,
+    "end": 2.4747
+  },
+  {
+    "id": "w7",
+    "text": "wallets",
+    "start": 2.517,
+    "end": 2.816
+  },
+  {
+    "id": "w8",
+    "text": "your",
+    "start": 2.901,
+    "end": 3.029
+  },
+  {
+    "id": "w9",
+    "text": "agents",
+    "start": 3.072,
+    "end": 3.413
+  },
+  {
+    "id": "w10",
+    "text": "spend",
+    "start": 3.584,
+    "end": 3.712
+  },
+  {
+    "id": "w11",
+    "text": "from,",
+    "start": 3.84,
+    "end": 4.181
+  },
+  {
+    "id": "w12",
+    "text": "on",
+    "start": 4.352,
+    "end": 4.48
+  },
+  {
+    "id": "w13",
+    "text": "Sui.",
+    "start": 4.565,
+    "end": 5.018820861678004
+  }
+]

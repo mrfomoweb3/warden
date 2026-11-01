@@ -1,0 +1,34 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif.woff2") format("woff2"); font-weight: 400; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #111; }
+    #ask-sky { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    #ask-stage { position: absolute; inset: 0; }
+    #ask-phone { position: absolute; left: 1250px; top: 70px; width: 520px; height: 940px; background: #0d0d0d; border-radius: 68px; padding: 18px;
+      box-shadow: 0 30px 80px rgba(20, 40, 60, 0.35); overflow: hidden; }
+    #ask-phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 52px; }
+    #ask-title { position: absolute; left: 120px; top: 150px; font: 400 112px/0.98 "Instrument Serif", serif; letter-spacing: -0.03em; width: 1000px; }
+    #ask-title em { font-style: normal; color: #5f6f2e; }
+    /* A real crop of the person's screenshot: the 💬 explanation, shown at full size. */
+    #ask-crop { position: absolute; left: 110px; top: 500px; width: 1060px; height: 470px; border-radius: 28px; overflow: hidden;
+      box-shadow: 0 24px 60px rgba(20, 30, 40, 0.35); background: #222; }
+    #ask-crop img { position: absolute; left: -20px; top: -525px; width: 1080px; height: 2202px; }
+  </style>
+  <div data-hf-id="hf-ltkc" id="root" data-composition-id="ask" data-width="1920" data-height="1080">
+    <img data-hf-id="hf-l002" id="ask-sky" class="clip" src="assets/img/sky.webp" data-start="0" data-duration="5.6" data-track-index="0" alt="" />
+    <div data-hf-id="hf-ibzq" id="ask-stage" class="clip" data-start="0" data-duration="5.6" data-track-index="1">
+      <div data-hf-id="hf-u1uv" id="ask-phone"><img data-hf-id="hf-7eur" src="assets/img/tg-ask-still.png" alt="Warden asking about a new counterparty in Telegram" /></div>
+      <div data-hf-id="hf-vklr" id="ask-title">Warden asks, and <em data-hf-id="hf-l83t">explains why</em></div>
+      <div data-hf-id="hf-46o7" id="ask-crop"><img data-hf-id="hf-3wvx" src="assets/img/tg-ask-still.png" alt="" /></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#ask-stage", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power3.out" }, 0);
+    tl.fromTo("#ask-title", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 1.8);
+    // Punch-in on the explanation, on "explains why" (3.3 s): the crop lifts out of the phone.
+    tl.fromTo("#ask-crop", { opacity: 0, scale: 0.55, x: 700, y: -60 }, { opacity: 1, scale: 1, x: 0, y: 0, duration: 0.5, ease: "power3.out", transformOrigin: "right top" }, 3.2);
+    tl.to("#ask-stage", { x: -60, opacity: 0, duration: 0.2, ease: "power2.in" }, 5.4);
+    window.__timelines["ask"] = tl;
+  </script>
+</template>

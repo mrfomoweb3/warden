@@ -1,0 +1,72 @@
+[
+  {
+    "id": "L01",
+    "scene": "hook",
+    "text": "It's two a.m. An AI agent with a retry bug is paying for the same API. Again. And again."
+  },
+  {
+    "id": "L02",
+    "scene": "tension",
+    "text": "Agents pay for data on their own now, over x402."
+  },
+  {
+    "id": "L03",
+    "scene": "tension",
+    "text": "Most pay from a hot key with no limits. An alert only tells you after the money has moved."
+  },
+  {
+    "id": "L04",
+    "scene": "reveal",
+    "text": "This is Warden. A watchdog for the wallets your agents spend from, on Sui."
+  },
+  {
+    "id": "L05",
+    "scene": "vault",
+    "text": "Your agents don't pay from their own wallets. They spend through SpendVault, a Move contract Warden can pause on-chain."
+  },
+  {
+    "id": "L06",
+    "scene": "rule",
+    "text": "You set the rules once, in plain English. Block anything over a dollar a day, and it becomes an on-chain cap."
+  },
+  {
+    "id": "L07",
+    "scene": "ask",
+    "text": "When something is new, Warden asks you, and explains why in plain words."
+  },
+  {
+    "id": "L08",
+    "scene": "learn",
+    "text": "Tap Always allow, and your answer becomes a rule. It won't ask about that again."
+  },
+  {
+    "id": "L09",
+    "scene": "pause",
+    "text": "Back to two a.m. Thirty payments to the same API in ten minutes. Warden pauses the agent on-chain. No confirm button. No human."
+  },
+  {
+    "id": "L10",
+    "scene": "blocked",
+    "text": "The agent keeps trying. The vault refuses, sixty-nine times, and moves nothing. That's a real transaction on Sui, signed by Warden's own key."
+  },
+  {
+    "id": "L11",
+    "scene": "tatum",
+    "text": "Warden watches the vault through Tatum's Sui gateway. One query covers every agent."
+  },
+  {
+    "id": "L12",
+    "scene": "walrus",
+    "text": "And it remembers in Walrus Memory: every rule, incident and reply. On a fresh server, Warden restored itself from Walrus and carried on."
+  },
+  {
+    "id": "L13",
+    "scene": "payoff",
+    "text": "In week one, it asks about everything. As your replies become rules, it asks less."
+  },
+  {
+    "id": "L14",
+    "scene": "end",
+    "text": "Your agents can spend. Warden watches."
+  }
+]

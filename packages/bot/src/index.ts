@@ -88,7 +88,8 @@ export class TelegramChannel implements OwnerChannel {
       if (reply) await this.send(reply);
     } else if (u.callback_query && String(u.callback_query.message?.chat.id) === this.ownerChatId && u.callback_query.data) {
       const reply = await onInput({ kind: "button", data: u.callback_query.data, messageId: u.callback_query.message?.message_id });
-      await this.api("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: reply?.slice(0, 190) ?? "OK" });
+      // The callback toast is plain text: strip the HTML the chat message uses.
+      await this.api("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: reply ? stripHtml(reply).slice(0, 190) : "OK" });
       if (reply) await this.send(reply);
     }
   }

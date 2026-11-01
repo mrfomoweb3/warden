@@ -25,7 +25,7 @@ Every payment decision is deterministic code. A model (Groq-hosted `gpt-oss-120b
 
 We deployed SpendVault to Sui testnet with three demo agents that pay x402 APIs: `researcher` (search), `pricebot` (a price feed) and `rogue`, which behaves until we make it loop.
 
-When we let `rogue` loop, it paid the same search API every couple of seconds. On its 30th payment within 10 minutes, Warden's velocity rule fired and Warden **paused it on-chain** ([the pause transaction](https://suiscan.xyz/testnet/tx/FimJPaM3fQ5kw6NA29VmGSAg23xkar1NjGc71X9Ypju8)). No confirm button, no human. `rogue` kept trying, and the vault refused all 66 attempts while moving nothing. SpendVault doesn't abort a blocked spend; it emits `SpendRejected`, so Warden could see a paused agent still hammering and raise a second, quieter flag about it.
+When we let `rogue` loop, it paid the same search API every couple of seconds. On its 30th payment within 10 minutes, Warden's velocity rule fired and Warden **paused it on-chain** ([the pause transaction](https://suiscan.xyz/testnet/tx/FimJPaM3fQ5kw6NA29VmGSAg23xkar1NjGc71X9Ypju8)). No confirm button, no human. `rogue` kept trying, and the vault refused all 69 attempts while moving nothing. SpendVault doesn't abort a blocked spend; it emits `SpendRejected`, so Warden could see a paused agent still hammering and raise a second, quieter flag about it.
 
 Warden also paid for its own due diligence. The first time an agent paid a counterparty it had never seen, Warden bought a risk check for that address from a paid API over x402, from its own small wallet ([one of those payments](https://suiscan.xyz/testnet/tx/88zNpyJAkCfGhQz6UgET8nnxMJb988Dh8qwGbvZPzdAR)). Agents paying agents, with a watchdog that pays for its own checks.
 

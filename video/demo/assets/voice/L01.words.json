@@ -1,0 +1,116 @@
+[
+  {
+    "id": "w0",
+    "text": "It's",
+    "start": 0.299,
+    "end": 0.469
+  },
+  {
+    "id": "w1",
+    "text": "two",
+    "start": 0.512,
+    "end": 0.725
+  },
+  {
+    "id": "w2",
+    "text": "a.m.",
+    "start": 0.768,
+    "end": 1.216
+  },
+  {
+    "id": "w3",
+    "text": "An",
+    "start": 1.365,
+    "end": 1.664
+  },
+  {
+    "id": "w4",
+    "text": "AI",
+    "start": 1.749,
+    "end": 2.048
+  },
+  {
+    "id": "w5",
+    "text": "agent",
+    "start": 2.133,
+    "end": 2.432
+  },
+  {
+    "id": "w6",
+    "text": "with",
+    "start": 2.517,
+    "end": 2.603
+  },
+  {
+    "id": "w7",
+    "text": "a",
+    "start": 2.645,
+    "end": 2.688
+  },
+  {
+    "id": "w8",
+    "text": "retry",
+    "start": 2.731,
+    "end": 3.1147
+  },
+  {
+    "id": "w9",
+    "text": "bug",
+    "start": 3.157,
+    "end": 3.328
+  },
+  {
+    "id": "w10",
+    "text": "is",
+    "start": 3.456,
+    "end": 3.541
+  },
+  {
+    "id": "w11",
+    "text": "paying",
+    "start": 3.627,
+    "end": 3.84
+  },
+  {
+    "id": "w12",
+    "text": "for",
+    "start": 3.883,
+    "end": 4.011
+  },
+  {
+    "id": "w13",
+    "text": "the",
+    "start": 4.053,
+    "end": 4.096
+  },
+  {
+    "id": "w14",
+    "text": "same",
+    "start": 4.139,
+    "end": 4.352
+  },
+  {
+    "id": "w15",
+    "text": "API.",
+    "start": 4.437,
+    "end": 5.205
+  },
+  {
+    "id": "w16",
+    "text": "Again.",
+    "start": 5.547,
+    "end": 6.144
+  },
+  {
+    "id": "w17",
+    "text": "And",
+    "start": 6.485,
+    "end": 6.5707
+  },
+  {
+    "id": "w18",
+    "text": "again.",
+    "start": 6.656,
+    "end": 6.925578231292517
+  }
+]

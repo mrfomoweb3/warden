@@ -1,0 +1,60 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif.woff2") format("woff2"); font-weight: 400; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #111; }
+    #vault-sky { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    #vault-cam { position: absolute; inset: 0; }
+    #vault-title { position: absolute; left: 120px; top: 120px; font: 400 112px/0.95 "Instrument Serif", serif; letter-spacing: -0.03em; }
+    #vault-title em { font-style: normal; color: #5f6f2e; }
+    .vault-agent { position: absolute; left: 120px; width: 440px; padding: 26px 30px; background: #fff; border-radius: 24px;
+      box-shadow: 0 18px 44px rgba(30, 50, 70, 0.18); font: 600 40px Inter, sans-serif; display: flex; align-items: center; gap: 20px; }
+    .vault-av { width: 56px; height: 56px; border-radius: 50%; color: #fff; display: grid; place-items: center; font: 700 28px Inter, sans-serif; }
+    #vault-a1 { top: 380px; } #vault-a2 { top: 530px; } #vault-a3 { top: 680px; }
+    #vault-box { position: absolute; left: 640px; top: 470px; width: 300px; padding: 30px; background: #111; color: #fff; border-radius: 28px; text-align: center;
+      box-shadow: 0 24px 60px rgba(20, 30, 40, 0.35); }
+    #vault-box b { display: block; font: 600 40px Inter, sans-serif; }
+    #vault-box span { display: block; margin-top: 8px; font: 500 28px "JetBrains Mono", monospace; color: #b9b8b1; }
+    #vault-code { position: absolute; left: 1010px; top: 330px; width: 820px; background: #141413; border-radius: 24px; padding: 30px 34px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4); font: 500 28px/1.55 "JetBrains Mono", monospace; color: #e9e8e2; white-space: pre; }
+    #vault-code .k { color: #b8d68a; }
+    #vault-code .c { color: #77766f; }
+    #vault-hl { display: inline-block; padding: 0 8px; margin: 0 -8px; border-radius: 8px; }
+    #vault-file { position: absolute; left: 1010px; top: 280px; font: 500 28px "JetBrains Mono", monospace; color: #2b2b28; }
+  </style>
+  <div data-hf-id="hf-fint" id="root" data-composition-id="vault" data-width="1920" data-height="1080">
+    <img data-hf-id="hf-uplg" id="vault-sky" class="clip" src="assets/img/sky.webp" data-start="0" data-duration="8.4" data-track-index="0" alt="" />
+    <div data-hf-id="hf-1l1v" id="vault-cam" class="clip" data-start="0" data-duration="8.4" data-track-index="1">
+      <div data-hf-id="hf-3h79" id="vault-title">They spend through <em data-hf-id="hf-tekr">SpendVault</em></div>
+      <div data-hf-id="hf-p0ov" class="vault-agent" id="vault-a1"><span data-hf-id="hf-gev1" class="vault-av" style="background:#3f5f7d">R</span>researcher</div>
+      <div data-hf-id="hf-ftts" class="vault-agent" id="vault-a2"><span data-hf-id="hf-e1u8" class="vault-av" style="background:#5f6f2e">P</span>pricebot</div>
+      <div data-hf-id="hf-d61v" class="vault-agent" id="vault-a3"><span data-hf-id="hf-tcd9" class="vault-av" style="background:#8c3b3b">R</span>rogue</div>
+      <div data-hf-id="hf-uqjb" id="vault-box"><b data-hf-id="hf-gkj9">SpendVault</b><span data-hf-id="hf-z38c">0x3b73…3135</span></div>
+      <div data-hf-id="hf-i83d" id="vault-file">packages/vault/sources/vault.move</div>
+<div data-hf-id="hf-izqa" id="vault-code"><span data-hf-id="hf-ey8s" class="k">public fun</span> pause_agent&lt;T&gt;(
+    warden: &amp;WardenCap, vault: &amp;<span data-hf-id="hf-i96i" class="k">mut</span> Vault&lt;T&gt;,
+    agent: ID, reason: vector&lt;u8&gt;) {
+    assert_warden(warden, vault);
+    <span data-hf-id="hf-mlll" class="k">let</span> s = &amp;<span data-hf-id="hf-0cym" class="k">mut</span> vault.agents[agent];
+    <span data-hf-id="hf-4m8j" class="k">if</span> (s.paused) <span data-hf-id="hf-lumi" class="k">return</span>;
+    <span data-hf-id="hf-mjhq" id="vault-hl">s.paused = true;</span>
+    event::emit(AgentPaused { … });
+}</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // Arrive from the phone zoom: the stage lands sharp.
+    tl.fromTo("#vault-cam", { scale: 1.12, filter: "blur(10px)" }, { scale: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 0);
+    tl.fromTo(["#vault-a1", "#vault-a2", "#vault-a3"], { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out", stagger: 0.12 }, 0.6);
+    tl.fromTo("#vault-title", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 3.3);
+    tl.fromTo("#vault-box", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, 3.9);
+    // The agents' wallets route into the vault on "SpendVault".
+    tl.to(["#vault-a1", "#vault-a2", "#vault-a3"], { x: 60, duration: 0.3, ease: "power2.inOut", stagger: 0.06 }, 4.0);
+    tl.fromTo(["#vault-file", "#vault-code"], { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 5.05);
+    // Punch in on the line that freezes an agent, on "pause on-chain" (6.54 s).
+    tl.fromTo("#vault-hl", { backgroundColor: "rgba(140,59,59,0)" }, { backgroundColor: "rgba(140,59,59,0.55)", duration: 0.2 }, 6.5);
+    // s.paused = true; sits near (1240, 641); at 1.55x that maps to the frame centre with this offset.
+    tl.to("#vault-cam", { scale: 1.55, x: -962, y: -454, duration: 0.55, ease: "power2.inOut", transformOrigin: "0 0" }, 6.45);
+    window.__timelines["vault"] = tl;
+  </script>
+</template>

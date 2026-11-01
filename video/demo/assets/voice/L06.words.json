@@ -1,0 +1,128 @@
+[
+  {
+    "id": "w0",
+    "text": "You",
+    "start": 0.256,
+    "end": 0.4267
+  },
+  {
+    "id": "w1",
+    "text": "set",
+    "start": 0.469,
+    "end": 0.597
+  },
+  {
+    "id": "w2",
+    "text": "the",
+    "start": 0.64,
+    "end": 0.725
+  },
+  {
+    "id": "w3",
+    "text": "rules",
+    "start": 0.768,
+    "end": 0.896
+  },
+  {
+    "id": "w4",
+    "text": "once,",
+    "start": 1.067,
+    "end": 1.493
+  },
+  {
+    "id": "w5",
+    "text": "in",
+    "start": 1.707,
+    "end": 1.792
+  },
+  {
+    "id": "w6",
+    "text": "plain",
+    "start": 1.835,
+    "end": 2.0907
+  },
+  {
+    "id": "w7",
+    "text": "English.",
+    "start": 2.133,
+    "end": 2.56
+  },
+  {
+    "id": "w8",
+    "text": "Block",
+    "start": 2.859,
+    "end": 3.1147
+  },
+  {
+    "id": "w9",
+    "text": "anything",
+    "start": 3.243,
+    "end": 3.456
+  },
+  {
+    "id": "w10",
+    "text": "over",
+    "start": 3.669,
+    "end": 3.797
+  },
+  {
+    "id": "w11",
+    "text": "a",
+    "start": 3.883,
+    "end": 3.925
+  },
+  {
+    "id": "w12",
+    "text": "dollar",
+    "start": 3.968,
+    "end": 4.1387
+  },
+  {
+    "id": "w13",
+    "text": "a",
+    "start": 4.267,
+    "end": 4.309
+  },
+  {
+    "id": "w14",
+    "text": "day,",
+    "start": 4.352,
+    "end": 4.693
+  },
+  {
+    "id": "w15",
+    "text": "and",
+    "start": 4.864,
+    "end": 5.035
+  },
+  {
+    "id": "w16",
+    "text": "it",
+    "start": 5.077,
+    "end": 5.12
+  },
+  {
+    "id": "w17",
+    "text": "becomes",
+    "start": 5.163,
+    "end": 5.248
+  },
+  {
+    "id": "w18",
+    "text": "an",
+    "start": 5.461,
+    "end": 5.5467
+  },
+  {
+    "id": "w19",
+    "text": "on-chain",
+    "start": 5.589,
+    "end": 6.0587
+  },
+  {
+    "id": "w20",
+    "text": "cap.",
+    "start": 6.187,
+    "end": 6.496
+  }
+]
