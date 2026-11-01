@@ -27,6 +27,10 @@ const Env = z.object({
   TELEGRAM_BOT_TOKEN: z.string().optional(),
   TELEGRAM_OWNER_CHAT_ID: z.string().optional(),
 
+  // "Try Warden": the private visitor API (proxied by the dashboard) and the public site URL used in bot messages.
+  WARDEN_API_PORT: z.coerce.number().int().default(4310),
+  PUBLIC_URL: z.string().url().default("https://usewarden.fly.dev"),
+
   POLL_FAST_MS: z.coerce.number().int().default(15_000),
   POLL_IDLE_MS: z.coerce.number().int().default(120_000),
   // Relative to the package dir (pnpm runs each package from its own folder): the repo-root .warden,

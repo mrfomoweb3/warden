@@ -10,7 +10,7 @@ Warden watches every payment your AI agents make on Sui, learns what normal look
 
 > 🎥 Demo video (1:44): [youtu.be/2kqzJp-XJmU](https://youtu.be/2kqzJp-XJmU)
 >
-> 🌐 Live: [usewarden.fly.dev](https://usewarden.fly.dev) (landing page) · [usewarden.fly.dev/dashboard](https://usewarden.fly.dev/dashboard) (live dashboard)
+> 🌐 Live: [usewarden.fly.dev](https://usewarden.fly.dev) (landing page) · [usewarden.fly.dev/try](https://usewarden.fly.dev/try) (try it with your own wallet) · [usewarden.fly.dev/dashboard](https://usewarden.fly.dev/dashboard) (live dashboard)
 >
 > 🤖 Telegram bot: [@usewarden_bot](https://t.me/usewarden_bot) (answers only the owner's chat during the testnet run)
 
@@ -70,6 +70,18 @@ Agents spend only through **SpendVault**, a Move contract. Warden holds a `Warde
 
 ## How to test
 
+### Try it in the browser (a Sui wallet, about 2 minutes)
+
+Open [usewarden.fly.dev/try](https://usewarden.fly.dev/try):
+
+1. **Connect a wallet.** Any Sui wallet works (Slush works with a Google account). You sign a one-time message. It costs nothing and moves no funds.
+2. **Name your agent** and pick a demo agent to watch (`pricebot`, `researcher` or `rogue`).
+3. **Set a rule in plain English**, e.g. "ask me before any new counterparty over $0.01". Warden's real parser turns it into a rule record.
+4. **See what Warden would do.** Your rules plus the week-one defaults run on that agent's latest real testnet payments, each linked to Suiscan.
+5. **Connect Telegram.** The bot messages you when a real payment trips your rules. Tap "Always allow" to teach it, or type new rules in the chat.
+
+Visitors run in **shadow mode**. Their rules use the same `decide()` engine on the same payments, but only the vault owner's chat can pause the real agents. Visitor rules are saved to Walrus Memory in their own namespace (`warden-visitors`) and restored on a fresh machine.
+
 ### Fastest: the simulation (no keys, about 1 minute)
 
 This runs Warden's real engine for 14 simulated days. Only the chain, Walrus Memory (`MemWalMock`) and Telegram are stand-ins.
@@ -108,12 +120,12 @@ pnpm dashboard                            # live dashboard on :4300
 ### Automated tests
 
 ```bash
-pnpm test        # 40 TypeScript tests (vitest)
+pnpm test        # 52 TypeScript tests (vitest)
 pnpm test:move   # 7 Move tests for SpendVault
 pnpm typecheck && pnpm lint
 ```
 
-Passing looks like `Tests 6 passed (6)` for `@warden/shared`, `Tests 34 passed (34)` for `@warden/warden`, and `Test result: OK. Total tests: 7; passed: 7` for Move.
+Passing looks like `Tests 6 passed (6)` for `@warden/shared`, `Tests 46 passed (46)` for `@warden/warden`, and `Test result: OK. Total tests: 7; passed: 7` for Move.
 
 ## Architecture
 
@@ -222,6 +234,7 @@ cp .env.example .env
 | `GROQ_MODEL` | Default `openai/gpt-oss-120b` | No |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_OWNER_CHAT_ID` | Owner channel. Without them, messages print to the console | No |
 | `POLL_FAST_MS`, `POLL_IDLE_MS` | Poll every 15 s after activity, backing off to 120 s when idle | No |
+| `WARDEN_API_PORT`, `PUBLIC_URL` | Private "Try Warden" API on localhost (default `4310`, proxied by the dashboard at `/api/try/*`) and the site URL used in bot messages | No |
 | `WARDEN_STATE_DIR`, `DASHBOARD_PORT` | Local state cache (default `../../.warden`) and dashboard port (default `4300`) | No |
 
 Never commit `.env`. It is in `.gitignore`.

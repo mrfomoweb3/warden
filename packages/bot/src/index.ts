@@ -13,6 +13,11 @@ export type OwnerInput =
   | { kind: "text"; text: string; replyToMessageId?: number }
   | { kind: "button"; data: string; messageId?: number };
 
+/** A reply to someone else's chat (a visitor trying Warden in shadow mode). */
+export type VisitorReply = string | { text: string; buttons?: Button[][] } | void;
+/** Handles input from any chat that isn't the owner's. Visitors never steer the real vault. */
+export type VisitorHandler = (chatId: string, input: OwnerInput) => Promise<VisitorReply>;
+
 export interface OwnerChannel {
   send(text: string, buttons?: Button[][]): Promise<number | undefined>;
   /** Starts delivering owner input; resolves when stopped. */
@@ -30,11 +35,23 @@ export class TelegramChannel implements OwnerChannel {
   private running = false;
   private offset = 0;
 
+  private onVisitor: VisitorHandler | null = null;
+
   constructor(
     private readonly token: string,
     private readonly ownerChatId: string,
     private readonly log: (msg: string) => void = console.error,
   ) {}
+
+  /** Routes every non-owner chat to `handler` (shadow-mode visitors). Without it, those chats are ignored. */
+  setVisitorHandler(handler: VisitorHandler): void {
+    this.onVisitor = handler;
+  }
+
+  /** The bot's @username, for t.me deep links. */
+  async username(): Promise<string> {
+    return (await this.api<{ username: string }>("getMe", {})).username;
+  }
 
   private async api<T>(method: string, body: unknown, timeoutMs = 15_000): Promise<T> {
     const res = await fetch(`https://api.telegram.org/bot${this.token}/${method}`, {
@@ -49,8 +66,13 @@ export class TelegramChannel implements OwnerChannel {
   }
 
   async send(text: string, buttons?: Button[][]): Promise<number | undefined> {
+    return this.sendTo(this.ownerChatId, text, buttons);
+  }
+
+  /** Sends to any chat (the owner's, or a linked visitor's). */
+  async sendTo(chatId: string, text: string, buttons?: Button[][]): Promise<number | undefined> {
     const msg = await this.api<{ message_id: number }>("sendMessage", {
-      chat_id: this.ownerChatId,
+      chat_id: chatId,
       text,
       parse_mode: "HTML",
       disable_web_page_preview: true,
@@ -91,7 +113,28 @@ export class TelegramChannel implements OwnerChannel {
       // The callback toast is plain text: strip the HTML the chat message uses.
       await this.api("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: reply ? stripHtml(reply).slice(0, 190) : "OK" });
       if (reply) await this.send(reply);
+    } else if (this.onVisitor) {
+      await this.handleVisitor(u, this.onVisitor);
     }
+  }
+
+  private async handleVisitor(u: TgUpdate, handler: VisitorHandler): Promise<void> {
+    if (u.message?.text) {
+      const chatId = String(u.message.chat.id);
+      await this.reply(chatId, await handler(chatId, { kind: "text", text: u.message.text, replyToMessageId: u.message.reply_to_message?.message_id }));
+    } else if (u.callback_query?.data && u.callback_query.message) {
+      const chatId = String(u.callback_query.message.chat.id);
+      const reply = await handler(chatId, { kind: "button", data: u.callback_query.data, messageId: u.callback_query.message.message_id });
+      const text = typeof reply === "string" ? reply : reply?.text;
+      await this.api("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: text ? stripHtml(text).slice(0, 190) : "OK" });
+      await this.reply(chatId, reply);
+    }
+  }
+
+  private async reply(chatId: string, reply: VisitorReply): Promise<void> {
+    if (!reply) return;
+    if (typeof reply === "string") await this.sendTo(chatId, reply);
+    else await this.sendTo(chatId, reply.text, reply.buttons);
   }
 
   stop(): void {
