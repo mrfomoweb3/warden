@@ -65,6 +65,20 @@ tr:last-child td { border-bottom: 0; }
 .memories li { font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; padding: 12px 14px; background: var(--card-2); border-radius: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
 .empty { color: var(--muted); padding: 28px 0; text-align: center; }
 .alert { background: #fff; border-radius: 16px; padding: 14px 18px; color: var(--ink-2); box-shadow: var(--shadow); }
+/* network badge, explorer links, footer */
+.badge.net { margin-right: 8px; background: #fff; }
+a.tx { color: var(--olive); text-decoration: none; border-bottom: 1px solid rgba(95,111,46,.35); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; white-space: nowrap; }
+a.tx:hover { border-bottom-color: var(--olive); }
+.site-foot { max-width: 1180px; margin: 16px auto 0; padding: 40px 24px 56px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 40px; color: var(--ink-2); }
+.faq h2 { margin: 0 0 12px; }
+.faq details { border-bottom: 1px solid var(--line); padding: 14px 0; }
+.faq summary { cursor: pointer; font-weight: 500; color: var(--ink); }
+.faq details p { margin: 8px 0 0; }
+.foot-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.foot-links h3 { font-size: 13px; font-weight: 500; color: var(--muted); margin: 0 0 10px; }
+.foot-links a, .foot-links span { display: block; padding: 4px 0; color: var(--ink); text-decoration: none; }
+.foot-links a:hover { color: var(--olive); }
+@media (max-width: 800px) { .site-foot { grid-template-columns: minmax(0, 1fr); } .foot-links { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 </style>
 </head>
 <body>
@@ -82,7 +96,7 @@ tr:last-child td { border-bottom: 0; }
       <a href="#memory" aria-label="Memory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></a>
       <a href="#agents" aria-label="Agents"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6z"/></svg></a>
     </div>
-    <div class="right"><span class="badge" id="mode">…</span></div>
+    <div class="right"><span class="badge net" id="net" hidden></span><span class="badge" id="mode">…</span></div>
   </nav>
   <div class="top-copy">
     <h1 class="serif">Your agents, quietly watched</h1>
@@ -126,7 +140,7 @@ tr:last-child td { border-bottom: 0; }
 
   <section class="card" id="agents">
     <h2>Agents</h2>
-    <p class="hint">Every agent spends through SpendVault, so Warden can pause it on-chain.</p>
+    <p class="hint">Every agent spends through SpendVault, so Warden can pause it on-chain.<span id="vaultLink"></span></p>
     <div class="scroll"><table id="agentsTable"></table></div>
   </section>
 
@@ -157,6 +171,21 @@ tr:last-child td { border-bottom: 0; }
   </section>
 </main>
 
+<footer class="site-foot">
+  <div class="faq">
+    <h2>Questions</h2>
+    <details><summary>What does Warden watch?</summary><p>Every payment an AI agent makes through its SpendVault on Sui: who it paid, how much, how often, and whether the vault refused it. It reads them through Tatum's Sui gateway, one query for every agent.</p></details>
+    <details><summary>Who can pause an agent?</summary><p>Warden, on its own, when a rule says so (for example 30 payments to the same address in 10 minutes). It holds a WardenCap on the vault. The owner can always unpause. Only the owner can withdraw funds.</p></details>
+    <details><summary>Where do the rules live?</summary><p>In Walrus Memory, as plain-English sentences with a JSON tail. They survive restarts and new servers, and Claude Code can read them through the Walrus Memory MCP.</p></details>
+    <details><summary>Which network is this?</summary><p>Sui testnet. Every payment and pause on this page links to Suiscan, so you can check it on-chain. Walrus Memory writes go to mainnet.</p></details>
+  </div>
+  <nav class="foot-links" aria-label="Footer">
+    <div><h3>Warden</h3><a href="/">Home</a><a href="/dashboard">Dashboard</a><a href="https://t.me/usewarden_bot" target="_blank" rel="noopener">Telegram bot</a></div>
+    <div><h3>Docs</h3><a href="https://github.com/mrfomoweb3/warden#readme" target="_blank" rel="noopener">README</a><a href="https://github.com/mrfomoweb3/warden" target="_blank" rel="noopener">Source code</a><a href="https://youtu.be/2kqzJp-XJmU" target="_blank" rel="noopener">Demo video</a></div>
+    <div><h3>Contact</h3><a href="https://github.com/mrfomoweb3/warden/issues" target="_blank" rel="noopener">Open an issue</a><span id="footVault"></span></div>
+  </nav>
+</footer>
+
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -165,6 +194,14 @@ const dayLabel = (d) => new Date(d + "T00:00:00Z").toLocaleDateString(undefined,
 const when = (iso) => new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) + " UTC";
 const usd = (n) => "$" + (n < 1 ? n.toFixed(3) : n.toFixed(2));
 const AGENT_COLORS = ["#5f6f2e", "#3f5f7d", "#8c3b3b", "#6a5a8c", "#8a6d2b"];
+// Sui transaction digests are 43-44 base58 characters. Only real (live) runs get explorer links.
+const DIGEST = /\b[1-9A-HJ-NP-Za-km-z]{43,44}\b/g;
+let NET = null;
+const scan = (kind, id) => `https://suiscan.xyz/${NET}/${kind}/${id}`;
+const short = (x) => `${x.slice(0, 6)}…${x.slice(-4)}`;
+const txLink = (d) => `<a class="tx" href="${scan("tx", d)}" target="_blank" rel="noopener" title="View on Suiscan (${NET})">${short(d)} ↗</a>`;
+/** Turns every transaction digest in already-escaped text into a Suiscan link. */
+const linkify = (html) => (NET ? html.replace(DIGEST, txLink) : html);
 const tableMode = { questions: false, rules: false };
 let last = null;
 
@@ -282,6 +319,12 @@ function render(s) {
   $("error").hidden = true;
   $("mode").textContent = s.mode === "simulated" ? "Simulated run" : "Live";
   $("updated").textContent = s.mode === "simulated" ? `Simulated ${s.days.length}-day run · generated ${when(s.generated)}` : `Live · updated ${new Date().toLocaleTimeString()}`;
+  NET = s.chain?.network ?? null;
+  $("net").hidden = !NET;
+  $("net").textContent = NET ? `Sui ${NET}` : "";
+  const vault = s.chain?.vaultId;
+  $("vaultLink").innerHTML = NET && vault ? ` Vault <a class="tx" href="${scan("object", vault)}" target="_blank" rel="noopener">${short(vault)} ↗</a> on Sui ${NET}.` : "";
+  $("footVault").innerHTML = NET && vault ? `<a href="${scan("object", vault)}" target="_blank" rel="noopener">Vault on Suiscan ↗</a>` : "";
   $("banner").hidden = s.mode !== "simulated";
   $("banner").innerHTML = `<b>Simulated run.</b> This is the real Warden engine (rules, learning, memory) with scripted agents and a scripted owner. The chain, Walrus Memory and Telegram are stand-ins.`;
 
@@ -313,15 +356,15 @@ function render(s) {
       ${r.learnedFrom ? `<span>from ${esc(r.learnedFrom)}</span>` : ""}${r.source !== "default" ? `<span>${when(r.created)}</span>` : ""}</div></div></li>`).join("");
 
   $("feedHint").textContent = s.mode === "simulated" ? "Scripted owner replies in the simulation, newest first." : "Live conversations happen in Telegram.";
-  $("feed").innerHTML = s.feed.length ? s.feed.map((m) => `<div class="bubble ${m.from === "owner" ? "me" : ""}"><div class="who">${m.from === "owner" ? "You" : "Warden"}</div>${esc(m.text.replace(/<[^>]+>/g, ""))}<time>${when(m.ts)}</time></div>`).join("") : `<p class="empty">Owner messages appear here in simulated runs. Live, they're in Telegram.</p>`;
+  $("feed").innerHTML = s.feed.length ? s.feed.map((m) => `<div class="bubble ${m.from === "owner" ? "me" : ""}"><div class="who">${m.from === "owner" ? "You" : "Warden"}</div>${linkify(esc(m.text.replace(/<[^>]+>/g, "")))}<time>${when(m.ts)}</time></div>`).join("") : `<p class="empty">Owner messages appear here in simulated runs. Live, they're in Telegram.</p>`;
 
   $("incidents").innerHTML = s.incidents.length ? s.incidents.map((i) => {
     const a = ACTION[i.action];
-    return `<div class="incident"><span class="ic" aria-hidden="true">${a.icon}</span><div><div class="what">${esc(i.what)}</div>
-      <div class="meta">${a.label} · ${i.status === "open" ? "open" : esc(i.outcome || "resolved")} · ${when(i.created)}</div></div></div>`;
+    return `<div class="incident"><span class="ic" aria-hidden="true">${a.icon}</span><div><div class="what">${linkify(esc(i.what))}</div>
+      <div class="meta">${a.label} · ${i.status === "open" ? "open" : esc(i.outcome || "resolved")} · ${when(i.created)}${NET && (i.action === "pause" || i.action === "tighten") && /^[1-9A-HJ-NP-Za-km-z]{43,44}$/.test(i.tx || "") ? ` · vault tx ${txLink(i.tx)}` : ""}</div></div></div>`;
   }).join("") : `<p class="empty">Nothing yet. Quiet is good.</p>`;
 
-  $("memories").innerHTML = s.memories.map((m) => `<li>${esc(m)}</li>`).join("");
+  $("memories").innerHTML = s.memories.map((m) => `<li>${linkify(esc(m))}</li>`).join("");
 }
 
 async function refresh() {
@@ -329,13 +372,35 @@ async function refresh() {
     const r = await fetch("/api/state", { cache: "no-store" });
     const body = await r.json();
     if (!r.ok) throw new Error(body.error);
+    const first = !last;
     render(body);
+    // The browser jumps to #section before the data has rendered; jump again once the content is in place.
+    if (first && location.hash && document.querySelector(location.hash)) document.querySelector(location.hash).scrollIntoView();
+    syncNav();
   } catch (e) {
     $("error").hidden = false; $("error").textContent = e.message;
   }
 }
 refresh();
 setInterval(refresh, 5000);
+
+// Highlight the nav icon of the section on screen ("Dashboard" while at the top).
+const navLinks = [...document.querySelectorAll(".pillnav a")];
+const spy = [["agents", "#agents"], ["rules", "#rules"], ["memory", "#memory"]];
+function syncNav() {
+  const line = window.innerHeight * 0.35;
+  let current = "/dashboard";
+  // At the top of the page "Dashboard" is current, however tall the screen.
+  if (window.scrollY > 8) for (const [id, href] of spy) if ($(id).getBoundingClientRect().top <= line) current = href;
+  // At the very bottom the last section may never reach the line: treat it as current.
+  if (window.scrollY > 0 && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) current = spy[spy.length - 1][1];
+  navLinks.forEach((a) => (a.getAttribute("href") === current ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current")));
+}
+addEventListener("scroll", syncNav, { passive: true });
+addEventListener("resize", syncNav);
+addEventListener("hashchange", syncNav);
+addEventListener("load", syncNav); // after the browser scrolls to a #section on first load
+syncNav();
 </script>
 </body>
 </html>

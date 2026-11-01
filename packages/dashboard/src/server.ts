@@ -77,6 +77,8 @@ async function state() {
   return {
     mode: s.meta ? "simulated" : "live",
     generated: s.meta?.generated ?? new Date().toISOString(),
+    // Lets the page label the network and link the vault and every transaction to an explorer. Simulated runs have no chain.
+    chain: s.meta ? null : { network: process.env.SUI_NETWORK ?? "testnet", vaultId: process.env.VAULT_OBJECT_ID ?? null, packageId: process.env.VAULT_PACKAGE_ID ?? null },
     totals: {
       payments: sum("events"),
       silent: sum("auto_handled"),
@@ -106,7 +108,7 @@ async function state() {
       openIncidents: incidents.filter((i) => i.agent === p.agent && i.status === "open").length,
     })),
     rules: rules.map((r) => ({ id: r.id, text: r.text, action: r.action, source: r.source, enabled: r.enabled, created: r.created, learnedFrom: r.learned_from, scope: r.scope })),
-    incidents: incidents.slice(0, 40).map((i) => ({ id: i.id, agent: i.agent, what: i.what, action: i.action, status: i.status, outcome: i.outcome, created: i.created })),
+    incidents: incidents.slice(0, 40).map((i) => ({ id: i.id, agent: i.agent, what: i.what, action: i.action, status: i.status, outcome: i.outcome, created: i.created, tx: i.tx })),
     // Digests are already in the charts; the feed is for the question → reply → rule conversation.
     feed: s.meta?.feed.filter((m) => !m.text.startsWith("📒")).slice(-60).reverse() ?? [],
     memories: [...learned.slice(-4), ...incidents.slice(0, 3), ...s.of("feedback").slice(-3), ...profiles.slice(0, 2)].map(describe),
