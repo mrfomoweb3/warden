@@ -1,0 +1,52 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif.woff2") format("woff2"); font-weight: 400; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #111; }
+    #walrus-sky { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    #walrus-stage { position: absolute; inset: 0; }
+    #walrus-title { position: absolute; left: 120px; top: 110px; width: 1700px; font: 400 116px/0.95 "Instrument Serif", serif; letter-spacing: -0.03em; }
+    #walrus-title em { font-style: normal; color: #5f6f2e; }
+    #walrus-mem { position: absolute; left: 120px; top: 300px; width: 1080px; padding: 34px 38px; background: #fff; border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(30, 50, 70, 0.22); }
+    #walrus-mem-k { font: 600 28px Inter, sans-serif; color: #5f6f2e; margin-bottom: 14px; }
+    #walrus-mem-t { font: 500 34px/1.4 Inter, sans-serif; color: #2b2b28; }
+    #walrus-mem-j { margin-top: 18px; font: 500 28px/1.5 "JetBrains Mono", monospace; color: #8d8c86; }
+    #walrus-log { position: absolute; left: 640px; top: 620px; width: 1180px; background: #141413; border-radius: 24px; padding: 26px 32px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4); font: 500 28px/1.55 "JetBrains Mono", monospace; color: #e9e8e2; }
+    #walrus-log-h { color: #8d8c86; margin-bottom: 8px; }
+    #walrus-restored { display: inline-block; padding: 0 8px; margin: 0 -8px; border-radius: 8px; color: #b8d68a; }
+    #walrus-l2, #walrus-l3 { opacity: 0; }
+  </style>
+  <div data-hf-id="hf-pnpp" id="root" data-composition-id="walrus" data-width="1920" data-height="1080">
+    <img data-hf-id="hf-l5d9" id="walrus-sky" class="clip" src="assets/img/sky.webp" data-start="0" data-duration="9.6" data-track-index="0" alt="" />
+    <div data-hf-id="hf-9ni7" id="walrus-stage" class="clip" data-start="0" data-duration="9.6" data-track-index="1">
+      <div data-hf-id="hf-zdpi" id="walrus-title">It remembers in <em data-hf-id="hf-j6x8">Walrus Memory</em></div>
+      <div data-hf-id="hf-ne1r" id="walrus-mem">
+        <div data-hf-id="hf-e10h" id="walrus-mem-k">Memory · incident</div>
+        <div data-hf-id="hf-b8j2" id="walrus-mem-t">Incident inc_mvwfctosqha on agent rogue: rogue paid 0x0d4c…d32a 30× in 10 min. Warden action: pause.</div>
+        <div data-hf-id="hf-e054" id="walrus-mem-j">---warden type=incident key=inc_mvwfctosqha---</div>
+      </div>
+      <div data-hf-id="hf-ah4i" id="walrus-log">
+        <div data-hf-id="hf-o02j" id="walrus-log-h">fly.io · usewarden · fresh machine</div>
+        <div data-hf-id="hf-2ihn">[supervisor] starting paid-apis, warden, dashboard, agents</div>
+        <div data-hf-id="hf-1pu1" id="walrus-l2">[warden] <span data-hf-id="hf-5nu2" id="walrus-restored">restored 17 records from Walrus Memory</span></div>
+        <div data-hf-id="hf-c09n" id="walrus-l3">[warden] watching vault 0x3b73…3135 on testnet via Tatum</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // Blur swap on the same day stage.
+    tl.fromTo("#walrus-stage", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power3.out" }, 0);
+    tl.fromTo("#walrus-title", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 1.35);
+    // "every rule, incident and reply": the real incident memory.
+    tl.fromTo("#walrus-mem", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 2.5);
+    // "On a fresh server" (5.48 s): the Fly boot log; "restored" (6.76 s) lights up.
+    tl.fromTo("#walrus-log", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 5.4);
+    tl.to("#walrus-l2", { opacity: 1, duration: 0.08 }, 6.6);
+    tl.fromTo("#walrus-restored", { backgroundColor: "rgba(95,111,46,0)" }, { backgroundColor: "rgba(95,111,46,0.35)", duration: 0.2 }, 6.75);
+    tl.to("#walrus-l3", { opacity: 1, duration: 0.08 }, 7.9);
+    tl.to("#walrus-stage", { opacity: 0, filter: "blur(8px)", duration: 0.18, ease: "power2.in" }, 9.4);
+    window.__timelines["walrus"] = tl;
+  </script>
+</template>

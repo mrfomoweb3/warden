@@ -1,0 +1,80 @@
+[
+  {
+    "id": "w0",
+    "text": "When",
+    "start": 0.256,
+    "end": 0.4267
+  },
+  {
+    "id": "w1",
+    "text": "something",
+    "start": 0.469,
+    "end": 0.64
+  },
+  {
+    "id": "w2",
+    "text": "is",
+    "start": 0.768,
+    "end": 0.8107
+  },
+  {
+    "id": "w3",
+    "text": "new,",
+    "start": 0.896,
+    "end": 1.259
+  },
+  {
+    "id": "w4",
+    "text": "Warden",
+    "start": 1.451,
+    "end": 1.792
+  },
+  {
+    "id": "w5",
+    "text": "asks",
+    "start": 1.835,
+    "end": 2.005
+  },
+  {
+    "id": "w6",
+    "text": "you,",
+    "start": 2.176,
+    "end": 2.368
+  },
+  {
+    "id": "w7",
+    "text": "and",
+    "start": 2.475,
+    "end": 2.816
+  },
+  {
+    "id": "w8",
+    "text": "explains",
+    "start": 2.901,
+    "end": 3.2
+  },
+  {
+    "id": "w9",
+    "text": "why",
+    "start": 3.328,
+    "end": 3.541
+  },
+  {
+    "id": "w10",
+    "text": "in",
+    "start": 3.797,
+    "end": 3.968
+  },
+  {
+    "id": "w11",
+    "text": "plain",
+    "start": 4.011,
+    "end": 4.224
+  },
+  {
+    "id": "w12",
+    "text": "words.",
+    "start": 4.309,
+    "end": 4.789
+  }
+]

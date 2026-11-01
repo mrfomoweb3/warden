@@ -1,0 +1,48 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif.woff2") format("woff2"); font-weight: 400; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #111; }
+    #rule-sky { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    #rule-stage { position: absolute; inset: 0; }
+    #rule-kicker { position: absolute; left: 120px; top: 190px; font: 500 40px Inter, sans-serif; color: #2b2b28; }
+    #rule-quote { position: absolute; left: 120px; top: 270px; width: 860px; font: 400 112px/1.0 "Instrument Serif", serif; letter-spacing: -0.03em; }
+    #rule-arrow { position: absolute; left: 120px; top: 640px; padding: 22px 30px; background: #fff; border-radius: 22px;
+      box-shadow: 0 18px 44px rgba(30, 50, 70, 0.18); font: 600 42px Inter, sans-serif; }
+    #rule-arrow i { font-style: normal; color: #5f6f2e; }
+    #rule-json { position: absolute; left: 1040px; top: 250px; width: 820px; background: #141413; border-radius: 24px; padding: 30px 34px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); font: 500 28px/1.55 "JetBrains Mono", monospace; color: #e9e8e2; white-space: pre; }
+    #rule-json .k { color: #b8d68a; }
+    #rule-json .c { color: #8d8c86; }
+    #rule-src { position: absolute; left: 1040px; top: 196px; font: 500 28px Inter, sans-serif; color: #2b2b28; }
+  </style>
+  <div data-hf-id="hf-oqud" id="root" data-composition-id="rule" data-width="1920" data-height="1080">
+    <img data-hf-id="hf-futt" id="rule-sky" class="clip" src="assets/img/sky.webp" data-start="0" data-duration="7.4" data-track-index="0" alt="" />
+    <div data-hf-id="hf-3mv7" id="rule-stage" class="clip" data-start="0" data-duration="7.4" data-track-index="1">
+      <div data-hf-id="hf-369f" id="rule-kicker">You type, once:</div>
+      <div data-hf-id="hf-ikn4" id="rule-quote">“Block anything over $1/day”</div>
+      <div data-hf-id="hf-ywrp" id="rule-arrow">→ <i data-hf-id="hf-e8iw">on-chain daily cap</i>, set by Warden</div>
+      <div id="rule-src">Warden’s parser (Groq), real output:</div>
+<div id="rule-json">{
+  <span class="k">"condition"</span>: {
+    <span class="k">"kind"</span>: "daily_over",
+    <span class="k">"usd"</span>: 1
+  },
+  <span class="k">"action"</span>: "tighten",
+  <span class="k">"tighten"</span>: { <span class="k">"daily_usd"</span>: 1 }
+}
+<span class="c">// "Block any payment exceeding $1 per day"</span></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#rule-stage", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25, ease: "power3.out" }, 0);
+    tl.fromTo("#rule-kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.6);
+    // The rule lands on "Block" (3.26 s), the cap on "cap" (6.59 s).
+    tl.fromTo("#rule-quote", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 3.2);
+    // The parser's real output arrives once the rule has been said.
+    tl.fromTo(["#rule-src", "#rule-json"], { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 4.4);
+    tl.fromTo("#rule-arrow", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 5.55);
+    tl.to("#rule-stage", { opacity: 0, filter: "blur(8px)", duration: 0.18, ease: "power2.in" }, 7.2);
+    window.__timelines["rule"] = tl;
+  </script>
+</template>

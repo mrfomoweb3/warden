@@ -1,0 +1,92 @@
+[
+  {
+    "id": "w0",
+    "text": "Tap",
+    "start": 0.256,
+    "end": 0.512
+  },
+  {
+    "id": "w1",
+    "text": "Always",
+    "start": 0.64,
+    "end": 0.9387
+  },
+  {
+    "id": "w2",
+    "text": "allow,",
+    "start": 1.237,
+    "end": 1.749
+  },
+  {
+    "id": "w3",
+    "text": "and",
+    "start": 2.005,
+    "end": 2.091
+  },
+  {
+    "id": "w4",
+    "text": "your",
+    "start": 2.133,
+    "end": 2.2187
+  },
+  {
+    "id": "w5",
+    "text": "answer",
+    "start": 2.261,
+    "end": 2.4747
+  },
+  {
+    "id": "w6",
+    "text": "becomes",
+    "start": 2.603,
+    "end": 2.7307
+  },
+  {
+    "id": "w7",
+    "text": "a",
+    "start": 2.901,
+    "end": 2.9867
+  },
+  {
+    "id": "w8",
+    "text": "rule.",
+    "start": 3.029,
+    "end": 3.413
+  },
+  {
+    "id": "w9",
+    "text": "It",
+    "start": 3.669,
+    "end": 3.7547
+  },
+  {
+    "id": "w10",
+    "text": "won't",
+    "start": 3.797,
+    "end": 3.968
+  },
+  {
+    "id": "w11",
+    "text": "ask",
+    "start": 4.011,
+    "end": 4.096
+  },
+  {
+    "id": "w12",
+    "text": "about",
+    "start": 4.224,
+    "end": 4.352
+  },
+  {
+    "id": "w13",
+    "text": "that",
+    "start": 4.395,
+    "end": 4.5227
+  },
+  {
+    "id": "w14",
+    "text": "again.",
+    "start": 4.565,
+    "end": 4.891
+  }
+]

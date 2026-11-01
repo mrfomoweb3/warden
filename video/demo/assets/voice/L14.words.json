@@ -1,0 +1,38 @@
+[
+  {
+    "id": "w0",
+    "text": "Your",
+    "start": 0.299,
+    "end": 0.469
+  },
+  {
+    "id": "w1",
+    "text": "agents",
+    "start": 0.512,
+    "end": 0.896
+  },
+  {
+    "id": "w2",
+    "text": "can",
+    "start": 1.024,
+    "end": 1.109
+  },
+  {
+    "id": "w3",
+    "text": "spend.",
+    "start": 1.152,
+    "end": 1.728
+  },
+  {
+    "id": "w4",
+    "text": "Warden",
+    "start": 2.005,
+    "end": 2.389
+  },
+  {
+    "id": "w5",
+    "text": "watches.",
+    "start": 2.432,
+    "end": 2.966575963718821
+  }
+]

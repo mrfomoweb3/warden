@@ -1,0 +1,69 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif.woff2") format("woff2"); font-weight: 400; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; }
+    #hook-sky { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    #hook-grass { position: absolute; left: 0; bottom: -2px; width: 1920px; height: 240px; object-fit: cover; object-position: 70% top; }
+    #hook-stage { position: absolute; inset: 0; }
+    #hook-term { position: absolute; left: 96px; top: 150px; width: 1120px; height: 640px; background: #141413; border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); overflow: hidden; }
+    #hook-term-bar { height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 28px; color: #8d8c86; font: 500 28px "JetBrains Mono", monospace; border-bottom: 1px solid #2a2a28; }
+    .hook-dot { width: 14px; height: 14px; border-radius: 50%; background: #3a3a37; }
+    #hook-lines { position: absolute; left: 32px; right: 32px; top: 92px; }
+    .hook-line { font: 500 28px/1.55 "JetBrains Mono", monospace; color: #e9e8e2; white-space: nowrap; }
+    .hook-line b { color: #f2a69c; font-weight: 500; }
+    .hook-line i { color: #77766f; font-style: normal; }
+    #hook-tally { position: absolute; left: 1290px; top: 230px; width: 540px; color: #fff; }
+    #hook-num { font: 400 300px/0.9 "Instrument Serif", serif; letter-spacing: -0.03em; }
+    #hook-label { margin-top: 18px; font: 500 38px/1.25 Inter, sans-serif; color: rgba(255, 255, 255, 0.92); }
+    #hook-label span { color: #f2a69c; }
+    #hook-phone { position: absolute; left: 1730px; top: 690px; width: 300px; height: 600px; background: #0d0d0d; border-radius: 56px; padding: 16px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5); }
+    #hook-phone-screen { width: 100%; height: 100%; border-radius: 42px; background: #1c2833; }
+    /* Initially hidden in CSS (a tl.set at 0 would not render on frame 0). */
+    .hook-line:nth-child(n+5) { opacity: 0; }
+  </style>
+  <div data-hf-id="hf-ktv8" id="root" data-composition-id="hook" data-width="1920" data-height="1080">
+    <img data-color-grading="{&quot;preset&quot;:null,&quot;intensity&quot;:1,&quot;adjust&quot;:{&quot;exposure&quot;:-1.7,&quot;contrast&quot;:0,&quot;highlights&quot;:0,&quot;shadows&quot;:0,&quot;whites&quot;:0,&quot;blacks&quot;:0,&quot;temperature&quot;:-0.4,&quot;tint&quot;:0,&quot;vibrance&quot;:0,&quot;saturation&quot;:-0.35},&quot;details&quot;:{&quot;vignette&quot;:0.1,&quot;vignetteMidpoint&quot;:0.5,&quot;vignetteRoundness&quot;:0,&quot;vignetteFeather&quot;:0.65,&quot;grain&quot;:0,&quot;grainSize&quot;:0.25,&quot;grainRoughness&quot;:0.5},&quot;effects&quot;:{&quot;blur&quot;:0,&quot;pixelate&quot;:0,&quot;chromaBleed&quot;:0,&quot;tapeDamage&quot;:0,&quot;tapeTracking&quot;:0,&quot;tapeNoise&quot;:1,&quot;tapeSpeed&quot;:0.5,&quot;filmArtifacts&quot;:0,&quot;halftone&quot;:0,&quot;halftoneSize&quot;:0,&quot;twoInkPrint&quot;:0,&quot;twoInkPrintSize&quot;:0,&quot;ascii&quot;:0,&quot;asciiSize&quot;:0.06578947368421052,&quot;asciiInvert&quot;:0,&quot;asciiStyle&quot;:0,&quot;asciiColor&quot;:1,&quot;asciiRotation&quot;:0,&quot;dither&quot;:0,&quot;ditherSize&quot;:0,&quot;bloom&quot;:0,&quot;bloomRadius&quot;:8,&quot;monoScreen&quot;:0,&quot;monoScreenSize&quot;:0,&quot;monoScreenAngle&quot;:0,&quot;monoScreenSpread&quot;:0,&quot;monoScreenShape&quot;:0,&quot;monoScreenInvert&quot;:0,&quot;scanlines&quot;:0,&quot;scanlineCount&quot;:0,&quot;scanlineSoftness&quot;:0,&quot;chromaticAberration&quot;:0,&quot;chromaticAngle&quot;:0,&quot;crtCurvature&quot;:0,&quot;digitalGlitch&quot;:0,&quot;digitalGlitchColorSplit&quot;:0,&quot;digitalGlitchLineTear&quot;:0,&quot;digitalGlitchPixelate&quot;:0,&quot;digitalGlitchBlockAmount&quot;:0,&quot;digitalGlitchBlockDisplacement&quot;:0,&quot;digitalGlitchBlockOpacity&quot;:0,&quot;digitalGlitchSpeed&quot;:0,&quot;engraving&quot;:0,&quot;engravingSpacing&quot;:0.4117647058823529,&quot;engravingMinThickness&quot;:0.2,&quot;engravingMaxThickness&quot;:0.4571428571428572,&quot;engravingAngle&quot;:0.25,&quot;engravingContrast&quot;:0.4666666666666667,&quot;engravingSharpness&quot;:0.59,&quot;engravingWave&quot;:0.2,&quot;engravingWaveFrequency&quot;:0.2222222222222222,&quot;crosshatch&quot;:0,&quot;crosshatchSpacing&quot;:0.28,&quot;crosshatchThickness&quot;:0.25,&quot;crosshatchAngle&quot;:0.25,&quot;crosshatchContrast&quot;:0.3333333333333333,&quot;crosshatchEdges&quot;:0.5,&quot;crosshatchLineWeight&quot;:0,&quot;crosshatchWave&quot;:0.33,&quot;crosshatchWaveFrequency&quot;:0.2222222222222222,&quot;kuwahara&quot;:0,&quot;kuwaharaRadius&quot;:0.14285714285714285,&quot;kuwaharaSharpness&quot;:0.3125,&quot;kuwaharaSaturation&quot;:0.5},&quot;lut&quot;:null,&quot;colorSpace&quot;:&quot;rec709&quot;}" data-hf-id="hf-h91x" id="hook-sky" class="clip" src="assets/img/sky.webp" data-start="0" data-duration="8.4" data-track-index="0" alt="">
+    <div data-hf-id="hf-x4pn" id="hook-stage" class="clip" data-start="0" data-duration="8.4" data-track-index="1">
+      <div data-hf-id="hf-fg5j" id="hook-term">
+        <div data-hf-id="hf-qn8w" id="hook-term-bar"><span data-hf-id="hf-vxby" class="hook-dot"></span><span data-hf-id="hf-ly02" class="hook-dot"></span><span data-hf-id="hf-mcb3" class="hook-dot"></span>&#160;pnpm --filter @warden/agents rogue</div>
+        <div data-hf-id="hf-yxxi" id="hook-lines">
+          <div data-hf-id="hf-c4cx" class="hook-line">[rogue] paid …/search?vendor=search&amp;q=retry <i data-hf-id="hf-y674">tx</i> <b data-hf-id="hf-8fb8">31V9VqyMtk…</b></div>
+          <div data-hf-id="hf-on7p" class="hook-line">[rogue] paid …/search?vendor=search&amp;q=retry <i data-hf-id="hf-y3fc">tx</i> <b data-hf-id="hf-cop6">47JftJ8QnU…</b></div>
+          <div data-hf-id="hf-pu4s" class="hook-line">[rogue] paid …/search?vendor=search&amp;q=retry <i data-hf-id="hf-wwi9">tx</i> <b data-hf-id="hf-y474">6DzpgAfa7o…</b></div>
+          <div data-hf-id="hf-pftr" class="hook-line">[rogue] paid …/search?vendor=search&amp;q=retry <i data-hf-id="hf-xata">tx</i> <b data-hf-id="hf-nzlh">AQLhg5yE2B…</b></div>
+          <div data-hf-id="hf-qmqu" class="hook-line">[rogue] paid …/search?vendor=search&amp;q=retry <i data-hf-id="hf-w3w7">tx</i> <b data-hf-id="hf-1b62">5Bkevxnzf2…</b></div>
+          <div data-hf-id="hf-q8ft" class="hook-line">[rogue] paid …/search?vendor=search&amp;q=retry <i data-hf-id="hf-wi78">tx</i> <b data-hf-id="hf-vc26">8DyaCeP8h1…</b></div>
+          <div data-hf-id="hf-rfcw" class="hook-line">[rogue] paid …/search?vendor=search&amp;q=retry <i data-hf-id="hf-r9b1">tx</i> <b data-hf-id="hf-iaiw">9agAaGMXHH…</b></div>
+          <div data-hf-id="hf-r11v" class="hook-line">[rogue] paid …/search?vendor=search&amp;q=retry <i data-hf-id="hf-rnm2">tx</i> <b data-hf-id="hf-tidp">rjRacwMeRY…</b></div>
+          <div data-hf-id="hf-lv2i" class="hook-line">[rogue] paid …/search?vendor=search&amp;q=retry <i data-hf-id="hf-0vkj">tx</i> <b data-hf-id="hf-tyry">BCKs88s3m5…</b></div>
+        </div>
+      </div>
+      <div data-hf-id="hf-rszl" id="hook-tally">
+        <div data-hf-id="hf-p3zu" id="hook-num">21</div>
+        <div data-hf-id="hf-sc6i" id="hook-label">payments to the <span data-hf-id="hf-ays7">same API</span>.<br data-hf-id="hf-x5px">Nobody is awake.</div>
+      </div>
+      <div data-hf-id="hf-fq2v" id="hook-phone"><div data-hf-id="hf-p3j8" id="hook-phone-screen"></div></div>
+    </div>
+    <img data-hf-id="hf-vq0h" id="hook-grass" class="clip" src="assets/img/grass.webp" data-start="0" data-duration="8.4" data-track-index="2" alt="">
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const lines = gsap.utils.toArray("#root .hook-line");
+    // Frame 0 is the thumbnail: four lines already printed, the rest arrive one by one.
+    lines.slice(4).forEach((el, i) => tl.fromTo(el, { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.12, ease: "power3.out" }, 0.9 + i * 1.15));
+    // Tally ticks with the lines and lands on 30 on the second "again" (7.06 s).
+    const n = { v: 21 };
+    tl.fromTo(n, { v: 21 }, { v: 30, duration: 6.1, ease: "none", onUpdate: () => { document.querySelector("#hook-num").textContent = Math.round(n.v); } }, 0.95);
+    tl.fromTo("#hook-num", { color: "#ffffff" }, { color: "#f2a69c", duration: 0.2 }, 7.0);
+    // The phone at the frame edge buzzes on "Again." and "And again."
+    tl.set("#hook-phone", { x: 0 }, 0);
+    [5.95, 7.06].forEach((t) => {
+      tl.to("#hook-phone", { x: -10, duration: 0.05, ease: "none", yoyo: true, repeat: 5 }, t);
+    });
+    // Whip out to the next scene.
+    tl.to("#hook-stage", { x: -520, filter: "blur(14px)", opacity: 0, duration: 0.26, ease: "power2.in" }, 8.1);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

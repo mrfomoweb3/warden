@@ -1,0 +1,37 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif.woff2") format("woff2"); font-weight: 400; }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #111; }
+    #learn-sky { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    #learn-stage { position: absolute; inset: 0; }
+    #learn-phone { position: absolute; left: 1210px; top: 50px; width: 560px; height: 980px; background: #0d0d0d; border-radius: 70px; padding: 18px;
+      box-shadow: 0 30px 80px rgba(20, 40, 60, 0.35); overflow: hidden; }
+    #learn-screen { position: relative; width: 100%; height: 100%; border-radius: 54px; overflow: hidden; background: #111; }
+    /* Anchored to the bottom: the newest messages ("Learned rule_002") arrive just above the input bar. */
+    #learn-rec { position: absolute; left: 0; bottom: 0; width: 524px; height: 1068px; object-fit: cover; object-position: bottom; }
+    #learn-title { position: absolute; left: 120px; top: 250px; width: 1000px; font: 400 116px/0.98 "Instrument Serif", serif; letter-spacing: -0.03em; }
+    #learn-title em { font-style: normal; color: #5f6f2e; }
+    #learn-chip { position: absolute; left: 120px; top: 600px; padding: 24px 32px; background: #fff; border-radius: 22px; box-shadow: 0 18px 44px rgba(30, 50, 70, 0.18);
+      font: 600 42px Inter, sans-serif; }
+    #learn-chip b { color: #5f6f2e; font-family: "JetBrains Mono", monospace; font-weight: 500; }
+  </style>
+  <div data-hf-id="hf-zw33" id="root" data-composition-id="learn" data-width="1920" data-height="1080">
+    <img data-hf-id="hf-lcys" id="learn-sky" class="clip" src="assets/img/sky.webp" data-start="0" data-duration="6.4" data-track-index="0" alt="" />
+    <div data-hf-id="hf-g9hw" id="learn-stage">
+      <div data-hf-id="hf-yzxa" id="learn-phone"><div data-hf-id="hf-ubeq" id="learn-screen">
+        <!-- The person's own screen recording: the tap on Always allow (2.5 s into the file) and "Learned rule_002" (3.0 s). -->
+        <video data-hf-id="hf-jzwf" id="learn-rec" class="clip" src="assets/video/always-allow.mp4" data-start="0" data-duration="6.4" data-media-start="1.6" data-track-index="2" muted playsinline></video>
+      </div></div>
+      <div data-hf-id="hf-9oep" id="learn-title">Your answer becomes <em data-hf-id="hf-ewow">a rule</em></div>
+      <div data-hf-id="hf-gm3p" id="learn-chip">Learned <b data-hf-id="hf-uqwy">rule_002</b>: won’t ask again</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#learn-phone", { x: 80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 0);
+    tl.fromTo("#learn-title", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 2.6);
+    // The chip lands on "rule" (3.43 s), echoing the reply on the phone.
+    tl.fromTo("#learn-chip", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.7)", transformOrigin: "left center" }, 3.4);
+    window.__timelines["learn"] = tl;
+  </script>
+</template>
