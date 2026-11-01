@@ -7,3 +7,12 @@ packages/vault/build/
 .warden/
 *.log
 .DS_Store
+
+# Video project: personal recordings, licensed catalog music and raw voice takes stay local
+ScreenRecording*.MP4
+ScreenRecording*.mp4
+video/demo/.media/
+video/demo/assets/voice/orig/
+video/demo/.hyperframes/
+video/demo/assets/music/
+video/demo/.thumbnails/
