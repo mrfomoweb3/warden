@@ -332,10 +332,12 @@ const SOURCE = { default: "default", telegram: "you said", feedback: "learned fr
 /** Live proof: what learning changed on real payments, and the latest runaway Warden contained. */
 function renderProof(s) {
   const L = s.learning, C = s.contained;
-  $("proof").hidden = !(L?.payments || C);
-  $("learnCard").hidden = !L?.payments;
+  // Only worth showing once learned rules changed a decision; identical columns say nothing.
+  const learned = L?.payments && ["escalate", "pause", "tighten"].some((k) => L.day1[k] !== L.today[k]);
+  $("proof").hidden = !(learned || C);
+  $("learnCard").hidden = !learned;
   $("containCard").hidden = !C;
-  if (L?.payments) {
+  if (learned) {
     $("learnHint").textContent = `The same ${fmt.format(L.payments)} real payments since ${when(new Date(L.since).toISOString())}, decided under the week-one defaults and under the rules Warden has learned since.`;
     const col = (label, x, cls = "") => `<div><div class="stat ${cls}">${fmt.format(x.escalate)}</div><div class="stat-label">${label}: questions to you</div><div class="hint" style="margin:4px 0 0">${fmt.format(x.allow)} handled silently · ${fmt.format(x.pause + x.tighten)} stepped in</div></div>`;
     $("learnStats").innerHTML = col("Day-1 rules", L.day1) + col("Today's rules", L.today, "olive");
