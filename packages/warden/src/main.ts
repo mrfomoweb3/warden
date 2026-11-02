@@ -76,7 +76,7 @@ async function main(): Promise<void> {
       .then((u) => visitors.setBotUsername(u))
       .catch((e: Error) => log(`telegram getMe failed, visitor linking is off: ${e.message}`));
   }
-  const api = startVisitorApi(visitors, cfg.WARDEN_API_PORT, log);
+  const api = startVisitorApi(visitors, cfg.WARDEN_API_PORT, log, () => warden.rules());
 
   void owner.listen((input) => warden.handleOwner(input));
 

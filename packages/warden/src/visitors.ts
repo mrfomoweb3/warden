@@ -31,6 +31,8 @@ export interface Visitor {
   watches: string;
   rules: RuleRecord[];
   chatId?: string;
+  /** A session without a wallet: kept on this server only (not Walrus), dropped after a week idle. */
+  guest?: boolean;
   nextRule: number;
   /** Bumped on every save, so a restore from Walrus keeps the newest copy even within one millisecond. */
   rev: number;
@@ -54,6 +56,8 @@ interface Snapshot {
   velocity: Record<number, number>;
   rejected: Record<number, number>;
 }
+
+export type Tally = Record<"allow" | "escalate" | "tighten" | "pause", number>;
 
 export interface ReplayItem {
   ts: number;
@@ -87,6 +91,9 @@ export interface VisitorDeps {
 
 const WINDOWS = [5, 10, 15, 30, 60, 120, 360, 1440];
 const MAX_VISITORS = 300;
+const MAX_GUESTS = 200;
+const GUESTS_PER_IP_HOUR = 5;
+const GUEST_IDLE_MS = 7 * 24 * 3_600_000;
 const MAX_RULES = 10;
 const PARSES_PER_HOUR = 30;
 const ALERT_DEDUPE_MS = 60 * 60_000;
@@ -95,7 +102,8 @@ const ALERTS_PER_DAY = 30;
 const NONCE_TTL_MS = 5 * 60_000;
 const LINK_TTL_MS = 15 * 60_000;
 const TOKEN_TTL_MS = 7 * 24 * 3_600_000;
-const RING = 60;
+/** Recent real payments kept for replays (visitors) and the day-1-vs-today comparison (dashboard). */
+const RING = 500;
 const MARKER = "\n---warden-visitor---\n";
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -149,6 +157,7 @@ export class VisitorRegistry {
   private nonces = new Map<string, number>();
   private links = new Map<string, { address: string; exp: number }>();
   private parses = new Map<string, number[]>();
+  private guestIps = new Map<string, number[]>();
   /** Alerts awaiting a button press: id → what the visitor is answering. */
   private alerts = new Map<string, { address: string; agent: string; counterparty: string; conditions: RuleRecord["condition"][] }>();
   private lastAlert = new Map<string, number>();
@@ -211,7 +220,7 @@ export class VisitorRegistry {
       await writeFile(tmp, JSON.stringify({ visitors: [...this.visitors.values()], ring: this.ring }, (_, v) => (typeof v === "bigint" ? v.toString() : v)));
       await rename(tmp, this.d.stateFile);
     }
-    if (changed && this.d.backend) {
+    if (changed && this.d.backend && !changed.guest) {
       const v = changed;
       const text =
         `Warden visitor ${short(v.address)} (shadow-mode rules): agent "${v.agentName || "unnamed"}" watching ${v.watches}; ` +
@@ -256,6 +265,31 @@ export class VisitorRegistry {
       this.visitors.set(addr, v);
       await this.save(v);
     }
+    return this.issue(addr);
+  }
+
+  /** For visitors without a Sui wallet: the same steps under a random stand-in address. */
+  async guest(ip: string): Promise<{ token: string; address: string }> {
+    const t = this.now();
+    const recent = (this.guestIps.get(ip) ?? []).filter((x) => x > t - 3_600_000);
+    if (recent.length >= GUESTS_PER_IP_HOUR) throw new VisitorError("Too many guest sessions from here. Try again in an hour, or connect a wallet.", 429);
+    this.guestIps.set(ip, [...recent, t]);
+    let guests = 0;
+    for (const [a, v] of this.visitors) {
+      if (!v.guest) continue;
+      if (!v.chatId && Date.parse(v.updated) < t - GUEST_IDLE_MS) this.visitors.delete(a);
+      else guests++;
+    }
+    if (guests >= MAX_GUESTS || this.visitors.size >= MAX_VISITORS) throw new VisitorError("The demo is full right now. Please try again later.", 503);
+    const addr = normalizeSuiAddress(randomBytes(32).toString("hex"));
+    const iso = new Date(t).toISOString();
+    const v: Visitor = { address: addr, agentName: "", watches: this.d.agents()[0] ?? "pricebot", rules: [], guest: true, nextRule: 1, rev: 0, created: iso, updated: iso };
+    this.visitors.set(addr, v);
+    await this.save(v);
+    return this.issue(addr);
+  }
+
+  private issue(addr: string): { token: string; address: string } {
     const until = this.now() + TOKEN_TTL_MS;
     const body = `${addr}.${until}`;
     return { token: `${body}.${this.sign(body)}`, address: addr };
@@ -418,9 +452,24 @@ export class VisitorRegistry {
       });
   }
 
+  /**
+   * The same recent real payments decided twice: under the week-one defaults (day 1) and
+   * under the rules Warden has today. Shows what learning changed, on live data.
+   */
+  learning(today: RuleRecord[]): { payments: number; since: number | null; day1: Tally; today: Tally } {
+    const tally = (rules: RuleRecord[]): Tally => {
+      const t: Tally = { allow: 0, escalate: 0, tighten: 0, pause: 0 };
+      for (const s of this.ring) if (s.event.kind === "spent") t[decide(rules, revive(s)).action]++;
+      return t;
+    };
+    const spent = this.ring.filter((s) => s.event.kind === "spent");
+    return { payments: spent.length, since: spent[0]?.event.ts ?? null, day1: tally(defaultRules()), today: tally(today) };
+  }
+
   view(v: Visitor) {
     return {
       address: v.address,
+      guest: Boolean(v.guest),
       agentName: v.agentName,
       watches: v.watches,
       agents: this.d.agents(),
@@ -506,7 +555,7 @@ export class VisitorRegistry {
     v.updated = new Date(this.now()).toISOString();
     await this.save(v);
     return (
-      `Linked to ${short(v.address)}. You're watching <b>${escapeHtml(v.watches)}</b> as "${escapeHtml(v.agentName || "your agent")}".\n` +
+      `Linked to ${v.guest ? "your guest session" : short(v.address)}. You're watching <b>${escapeHtml(v.watches)}</b> as "${escapeHtml(v.agentName || "your agent")}".\n` +
       `When one of its real payments trips your rules, I'll message you here. You're in shadow mode: your answers change only your rules, never the real vault.\n` +
       `Type a rule in plain English any time, or send /rules or /stop.`
     );

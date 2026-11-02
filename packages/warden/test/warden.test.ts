@@ -54,6 +54,10 @@ describe("Warden learning loop", () => {
     expect(t.vault.calls.filter((c) => c.startsWith("pause:"))).toEqual([`pause:${AGENT_IDS.rogue}`]);
     const inc = t.memory.list("incident").find((i) => i.action === "pause")!;
     expect(inc.what).toMatch(/paid 0x0000…00b1 30× in 10 min/);
+    // Everything that reached the same API within the 10-minute window; 12 s from the 30th payment (+59 s) to the pause (+71 s).
+    expect(inc.contained).toMatchObject({ payments: 36, seconds: 12 });
+    expect(inc.contained!.usd).toBeCloseTo(0.072, 6);
+    expect(t.owner.sent.find((m) => m.text.startsWith("⛔"))!.text).toContain("Contained: 36 payments ($0.072)");
 
     // Owner keeps it paused; the rogue keeps hammering and gets rejected on-chain.
     await t.warden.handleOwner({ kind: "button", data: button(t.owner, "keep") });
@@ -111,6 +115,19 @@ describe("Warden learning loop", () => {
     expect(hits.some((h) => h.includes("rule_001"))).toBe(true);
     expect(t.memory.stats().pending).toBe(0);
     expect(t.memory.stats().walrusWrites).toBeGreaterThanOrEqual(10);
+  });
+
+  it("brings back incidents and owner replies on a fresh machine", async () => {
+    const backend = mockBackend("fresh-incidents");
+    const t = await makeWarden(undefined, { backend });
+    t.chain.spend("researcher", addr(0xe2), 0.002, t.tick(1_000));
+    await t.cycle();
+    await t.warden.handleOwner({ kind: "button", data: button(t.owner, "always") });
+    await t.memory.flush();
+
+    const fresh = await makeWarden(undefined, { backend });
+    expect(fresh.memory.list("incident")).toHaveLength(1);
+    expect(fresh.memory.list("feedback").length).toBeGreaterThan(0);
   });
 
   it("keeps today's counters across a restart on a fresh machine", async () => {

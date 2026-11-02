@@ -71,7 +71,8 @@ async function state() {
   const rules = s.of("rule").sort((a, b) => a.created.localeCompare(b.created));
   const profiles = s.of("agent_profile").sort((a, b) => a.agent.localeCompare(b.agent));
   const incidents = s.of("incident").sort((a, b) => b.created.localeCompare(a.created));
-  const status = await agentStatus(s.meta, profiles);
+  const [status, learning] = await Promise.all([agentStatus(s.meta, profiles), s.meta ? null : fetchLearning()]);
+  const lastContained = incidents.find((i) => i.action === "pause" && i.contained);
   const sum = (k: "events" | "auto_handled" | "escalations" | "pauses" | "tightens" | "rules_learned") => metrics.reduce((n, m) => n + m[k], 0);
   const learned = rules.filter((r) => r.source !== "default");
 
@@ -83,11 +84,13 @@ async function state() {
     totals: {
       payments: sum("events"),
       silent: sum("auto_handled"),
-      questions: sum("escalations"),
-      pauses: sum("pauses"),
-      tightens: sum("tightens"),
+      // Daily counters can be missing after a restore; incidents are the durable record of each act.
+      questions: Math.max(sum("escalations"), incidents.filter((i) => i.action === "escalate").length),
+      pauses: Math.max(sum("pauses"), incidents.filter((i) => i.action === "pause").length),
+      tightens: Math.max(sum("tightens"), incidents.filter((i) => i.action === "tighten").length),
       rulesLearned: learned.length,
-      memoryWrites: s.written,
+      // The write counter is local; after a restore, the records rebuilt from Walrus are on Walrus too.
+      memoryWrites: Math.max(s.written, s.records.length),
       pendingWrites: s.pending,
       records: s.records.length,
     },
@@ -109,11 +112,24 @@ async function state() {
       openIncidents: incidents.filter((i) => i.agent === p.agent && i.status === "open").length,
     })),
     rules: rules.map((r) => ({ id: r.id, text: r.text, action: r.action, source: r.source, enabled: r.enabled, created: r.created, learnedFrom: r.learned_from, scope: r.scope })),
-    incidents: incidents.slice(0, 40).map((i) => ({ id: i.id, agent: i.agent, what: i.what, action: i.action, status: i.status, outcome: i.outcome, created: i.created, tx: i.tx })),
+    incidents: incidents.slice(0, 40).map((i) => ({ id: i.id, agent: i.agent, what: i.what, action: i.action, status: i.status, outcome: i.outcome, created: i.created, tx: i.tx, contained: i.contained })),
+    // The latest runaway Warden stopped, and the same real payments decided under day-1 vs today's rules.
+    contained: lastContained ? { agent: lastContained.agent, tx: lastContained.tx, ...lastContained.contained! } : null,
+    learning,
     // Digests are already in the charts; the feed is for the question → reply → rule conversation.
     feed: s.meta?.feed.filter((m) => !m.text.startsWith("📒")).slice(-60).reverse() ?? [],
     memories: [...learned.slice(-4), ...incidents.slice(0, 3), ...s.of("feedback").slice(-3), ...profiles.slice(0, 2)].map(describe),
   };
+}
+
+/** Day-1-vs-today comparison, computed by Warden over its recent real payments. Null while Warden is down. */
+async function fetchLearning(): Promise<unknown> {
+  try {
+    const r = await fetch(`${wardenApi}/learning`, { signal: AbortSignal.timeout(3_000) });
+    return r.ok ? await r.json() : null;
+  } catch {
+    return null;
+  }
 }
 
 /** "Try Warden": forwards /api/try/* to Warden's private visitor API on localhost. */
@@ -131,7 +147,12 @@ async function proxyTry(req: IncomingMessage, res: ServerResponse, rest: string)
   try {
     const r = await fetch(`${wardenApi}/visitor/${rest}`, {
       method: req.method,
-      headers: { "content-type": "application/json", ...(req.headers.authorization ? { authorization: req.headers.authorization } : {}) },
+      headers: {
+        "content-type": "application/json",
+        ...(req.headers.authorization ? { authorization: req.headers.authorization } : {}),
+        // Fly sets Fly-Client-IP; used only to rate-limit guest sessions.
+        "x-visitor-ip": String(req.headers["fly-client-ip"] ?? req.socket.remoteAddress ?? ""),
+      },
       body: req.method === "POST" ? Buffer.concat(chunks) : undefined,
       signal: AbortSignal.timeout(30_000),
     });

@@ -78,6 +78,10 @@ export const Incident = z.object({
   outcome: z.string().optional(),
   /** Plain-language explanation sent with the alert (written by the explainer model). */
   explanation: z.string().optional(),
+  /** For pauses: what the burst got through, and seconds from the payment that crossed the line to the pause. */
+  contained: z
+    .object({ payments: z.number().int(), usd: z.number(), first_payment: z.string(), paused_at: z.string(), seconds: z.number() })
+    .optional(),
   created: z.string(),
 });
 export type Incident = z.infer<typeof Incident>;

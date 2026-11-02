@@ -27,6 +27,7 @@ interface Hit {
   counterparty: string;
   ts: number;
   rejected: boolean;
+  amount: bigint;
 }
 
 /** Sliding 24h window of recent payments for velocity checks. */
@@ -39,7 +40,7 @@ export class RecentActivity {
     const id = `${e.digest}:${e.seq}`;
     if (this.seen.has(id)) return false;
     this.seen.add(id);
-    this.hits.push({ agent: e.label, counterparty: normalizeSuiAddress(e.recipient), ts: e.ts, rejected: e.kind === "rejected" });
+    this.hits.push({ agent: e.label, counterparty: normalizeSuiAddress(e.recipient), ts: e.ts, rejected: e.kind === "rejected", amount: e.amount });
     this.prune(e.ts);
     return true;
   }
@@ -51,6 +52,20 @@ export class RecentActivity {
       if (h.agent === agent && h.ts >= since && h.ts <= until && h.rejected === opts.rejected && (!opts.counterparty || h.counterparty === opts.counterparty)) n++;
     }
     return n;
+  }
+
+  /** Paid (not rejected) payments by an agent to one counterparty since `since`: what a burst got through. */
+  burst(agent: string, counterparty: string, since: number): { payments: number; amount: bigint; firstTs: number | null } {
+    let payments = 0;
+    let amount = 0n;
+    let firstTs: number | null = null;
+    for (const h of this.hits) {
+      if (h.agent !== agent || h.counterparty !== counterparty || h.rejected || h.ts < since) continue;
+      payments++;
+      amount += h.amount;
+      if (firstTs === null || h.ts < firstTs) firstTs = h.ts;
+    }
+    return { payments, amount, firstTs };
   }
 
   private prune(now: number): void {

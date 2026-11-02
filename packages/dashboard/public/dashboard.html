@@ -14,6 +14,7 @@ main { position: relative; z-index: 5; max-width: 1200px; margin: -110px auto 0;
 .row { display: grid; gap: 16px; }
 .r3 { grid-template-columns: 1.4fr 1fr 1fr; }
 .r2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.row[hidden] { display: none; }
 @media (max-width: 900px) { .r3, .r2 { grid-template-columns: minmax(0, 1fr); } }
 .card h2 { font-family: var(--serif); font-weight: 400; font-size: 34px; letter-spacing: -0.03em; line-height: 1; margin: 0 0 6px; }
 .hint { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
@@ -127,6 +128,19 @@ a.tx:hover { border-bottom-color: var(--olive); }
     </div>
   </section>
 
+  <section class="row r2" id="proof" hidden>
+    <div class="card" id="learnCard">
+      <h2>Day 1 vs today</h2>
+      <p class="hint" id="learnHint">The same real payments, decided under the week-one defaults and under the rules Warden has learned since.</p>
+      <div class="stats" id="learnStats"></div>
+    </div>
+    <div class="card" id="containCard">
+      <h2>Runaway stopped</h2>
+      <p class="hint">The vault's caps block what's over the limit. Warden pauses a looping agent before it drains the day's cap.</p>
+      <div id="containBody"></div>
+    </div>
+  </section>
+
   <section class="row r2">
     <div class="card">
       <div class="head"><div class="grow"><h2>Questions to you</h2><p class="hint">Escalations per day. This should fall as Warden learns.</p></div><button class="ghost" data-toggle="questions" type="button">Table</button></div>
@@ -176,6 +190,7 @@ a.tx:hover { border-bottom-color: var(--olive); }
     <h2>Questions</h2>
     <details><summary>What does Warden watch?</summary><p>Every payment an AI agent makes through its SpendVault on Sui: who it paid, how much, how often, and whether the vault refused it. It reads them through Tatum's Sui gateway, one query for every agent.</p></details>
     <details><summary>Who can pause an agent?</summary><p>Warden, on its own, when a rule says so (for example 30 payments to the same address in 10 minutes). It holds a WardenCap on the vault. The owner can always unpause. Only the owner can withdraw funds.</p></details>
+    <details><summary>Does Warden block payments?</summary><p>The vault does: it refuses anything over an agent's caps on its own. Warden sees each payment once it lands, then pauses a runaway agent or lowers its caps before a burst drains the day's limit. The "Runaway stopped" card shows how much got through and how fast the pause landed.</p></details>
     <details><summary>Where do the rules live?</summary><p>In Walrus Memory, as plain-English sentences with a JSON tail. They survive restarts and new servers, and Claude Code can read them through the Walrus Memory MCP.</p></details>
     <details><summary>Which network is this?</summary><p>Sui testnet. Every payment and pause on this page links to Suiscan, so you can check it on-chain. Walrus Memory writes go to mainnet.</p></details>
   </div>
@@ -314,6 +329,25 @@ const ACTION = {
 };
 const SOURCE = { default: "default", telegram: "you said", feedback: "learned from your reply", "claude-code": "Claude Code" };
 
+/** Live proof: what learning changed on real payments, and the latest runaway Warden contained. */
+function renderProof(s) {
+  const L = s.learning, C = s.contained;
+  // Only worth showing once learned rules changed a decision; identical columns say nothing.
+  const learned = L?.payments && ["escalate", "pause", "tighten"].some((k) => L.day1[k] !== L.today[k]);
+  $("proof").hidden = !(learned || C);
+  $("learnCard").hidden = !learned;
+  $("containCard").hidden = !C;
+  if (learned) {
+    $("learnHint").textContent = `The same ${fmt.format(L.payments)} real payments since ${when(new Date(L.since).toISOString())}, decided under the week-one defaults and under the rules Warden has learned since.`;
+    const col = (label, x, cls = "") => `<div><div class="stat ${cls}">${fmt.format(x.escalate)}</div><div class="stat-label">${label}: questions to you</div><div class="hint" style="margin:4px 0 0">${fmt.format(x.allow)} handled silently · ${fmt.format(x.pause + x.tighten)} stepped in</div></div>`;
+    $("learnStats").innerHTML = col("Day-1 rules", L.day1) + col("Today's rules", L.today, "olive");
+  }
+  if (C) {
+    $("containBody").innerHTML = `<div class="stats"><div><div class="stat maroon">${fmt.format(C.payments)}</div><div class="stat-label">payments got through (${usd(C.usd)})</div></div>${s.mode === "simulated" ? "" : `<div><div class="stat">${fmt.format(C.seconds)}s</div><div class="stat-label">from the payment that crossed the line to the pause</div></div>`}</div>
+      <p class="hint" style="margin:14px 0 0">${esc(C.agent)} · paused ${when(C.paused_at)}${NET && C.tx && /^[1-9A-HJ-NP-Za-km-z]{43,44}$/.test(C.tx) ? ` · ${txLink(C.tx)}` : ""}. Every later attempt was refused by the vault.</p>`;
+  }
+}
+
 function render(s) {
   last = s;
   $("error").hidden = true;
@@ -339,6 +373,7 @@ function render(s) {
   $("k-pending").textContent = t.pendingWrites ? `${t.pendingWrites} queued` : s.mode === "simulated" ? "mock" : "";
 
   renderCharts(s);
+  renderProof(s);
 
   $("agentsTable").innerHTML = s.agents.length ? `<thead><tr><th>Agent</th><th>Status</th><th class="num">Normal / day</th><th class="num">Usual counterparties</th><th class="num">Peak / hour</th><th class="num">Open questions</th></tr></thead><tbody>${s.agents.map((a, i) => `<tr>
       <td><span class="who-cell"><span class="ag" style="background:${AGENT_COLORS[i % AGENT_COLORS.length]}">${esc(a.agent[0].toUpperCase())}</span>${esc(a.agent)}</span></td>
