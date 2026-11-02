@@ -10,7 +10,7 @@ Warden watches every payment your AI agents make on Sui, learns what normal look
 
 > 🎥 Demo video (1:44): [youtu.be/2kqzJp-XJmU](https://youtu.be/2kqzJp-XJmU)
 >
-> 🌐 Live: [usewarden.fly.dev](https://usewarden.fly.dev) (landing page) · [usewarden.fly.dev/try](https://usewarden.fly.dev/try) (try it with your own wallet) · [usewarden.fly.dev/dashboard](https://usewarden.fly.dev/dashboard) (live dashboard)
+> 🌐 Live: [warden.mrfomolabs.xyz](https://warden.mrfomolabs.xyz) (landing page) · [warden.mrfomolabs.xyz/try](https://warden.mrfomolabs.xyz/try) (try it with your own wallet) · [warden.mrfomolabs.xyz/dashboard](https://warden.mrfomolabs.xyz/dashboard) (live dashboard)
 >
 > 🤖 Telegram bot: [@usewarden_bot](https://t.me/usewarden_bot) (answers only the owner's chat during the testnet run)
 
@@ -76,7 +76,7 @@ Agents spend only through **SpendVault**, a Move contract. Warden holds a `Warde
 
 ### Try it in the browser (a Sui wallet, about 2 minutes)
 
-Open [usewarden.fly.dev/try](https://usewarden.fly.dev/try):
+Open [warden.mrfomolabs.xyz/try](https://warden.mrfomolabs.xyz/try):
 
 1. **Connect a wallet.** Any Sui wallet works (Slush works with a Google account). You sign a one-time message. It costs nothing and moves no funds. No wallet? **Continue as a guest**: same steps, but your rules stay on the server instead of Walrus Memory.
 2. **Name your agent** and pick a demo agent to watch (`pricebot`, `researcher` or `rogue`).
