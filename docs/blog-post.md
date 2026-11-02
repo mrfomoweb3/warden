@@ -1,6 +1,6 @@
 # Warden: a watchdog for the wallets your AI agents spend from
 
-*Built for Total Recall: Tatum × Walrus Memory. Code: [github.com/mrfomoweb3/warden](https://github.com/mrfomoweb3/warden). Live: [usewarden.fly.dev](https://usewarden.fly.dev).*
+*Built for Total Recall: Tatum × Walrus Memory. Code: [github.com/mrfomoweb3/warden](https://github.com/mrfomoweb3/warden). Live: [warden.mrfomolabs.xyz](https://warden.mrfomolabs.xyz).*
 
 AI agents can pay for things now. With x402, an agent hits an API, gets a `402 Payment Required`, pays on-chain, and gets its data, no human in the loop. That's the point. It's also the problem: most of these agents pay from a hot key with no limits. Nothing stops an agent from paying the wrong address, paying too much, or paying the same API a thousand times because of a retry bug.
 
@@ -72,6 +72,6 @@ Warden saves the gateway's own resume cursor, so a restart picks up exactly wher
 - A public demo mode for the Telegram bot.
 - The same engine for other wallets that need a watchdog: a person's own wallet (learning regular payees and flagging lookalike-address poisoning) or a small team treasury.
 
-The code is open source: [github.com/mrfomoweb3/warden](https://github.com/mrfomoweb3/warden). The live dashboard is at [usewarden.fly.dev/dashboard](https://usewarden.fly.dev/dashboard).
+The code is open source: [github.com/mrfomoweb3/warden](https://github.com/mrfomoweb3/warden). The live dashboard is at [warden.mrfomolabs.xyz/dashboard](https://warden.mrfomolabs.xyz/dashboard).
 
 Thanks to [@Tatum_io](https://x.com/Tatum_io) and [@WalrusFoundation](https://x.com/WalrusFoundation) for the infrastructure that made this possible.

@@ -29,7 +29,7 @@ const Env = z.object({
 
   // "Try Warden": the private visitor API (proxied by the dashboard) and the public site URL used in bot messages.
   WARDEN_API_PORT: z.coerce.number().int().default(4310),
-  PUBLIC_URL: z.string().url().default("https://usewarden.fly.dev"),
+  PUBLIC_URL: z.string().url().default("https://warden.mrfomolabs.xyz"),
 
   POLL_FAST_MS: z.coerce.number().int().default(15_000),
   POLL_IDLE_MS: z.coerce.number().int().default(120_000),

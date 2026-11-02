@@ -2,12 +2,12 @@
 
 Before recording:
 - In Telegram, send `/unpause rogue` so the loop scene can happen live.
-- Open https://usewarden.fly.dev/dashboard in a browser tab.
+- Open https://warden.mrfomolabs.xyz/dashboard in a browser tab.
 - Have a terminal ready in the repo with `.env` loaded (for the rogue loop), and Suiscan open on the vault: https://suiscan.xyz/testnet/object/0x3b7388b0d82848c22a3bdf58fff56c96639d49a8e8278796473a638650113135
 
 | t | Show | Say |
 |---|---|---|
-| 0:00 | Landing page (usewarden.fly.dev), then the dashboard's agents table | "These AI agents pay for APIs on their own, on Sui, over x402. Most agents like this run on a hot key with no limits." |
+| 0:00 | Landing page (warden.mrfomolabs.xyz), then the dashboard's agents table | "These AI agents pay for APIs on their own, on Sui, over x402. Most agents like this run on a hot key with no limits." |
 | 0:15 | Telegram: type *"block anything over $1/day"* | "I tell Warden my rules once, in plain English." Show the reply with the rule id and the on-chain `set_caps` tx. |
 | 0:35 | Telegram: a ❓ question about a new counterparty with its 💬 explanation. Tap **Always allow** | "Week one, it asks about everything, and explains why in plain words. My answer becomes a rule." |
 | 0:55 | Dashboard: Rules learned, showing the learned rule (and the generalised rule if you have one) | "After three approvals for one agent it generalises, and tells me so." |
