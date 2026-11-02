@@ -88,7 +88,8 @@ async function state() {
       pauses: sum("pauses"),
       tightens: sum("tightens"),
       rulesLearned: learned.length,
-      memoryWrites: s.written,
+      // The write counter is local; after a restore, the records rebuilt from Walrus are on Walrus too.
+      memoryWrites: Math.max(s.written, s.records.length),
       pendingWrites: s.pending,
       records: s.records.length,
     },

@@ -117,6 +117,19 @@ describe("Warden learning loop", () => {
     expect(t.memory.stats().walrusWrites).toBeGreaterThanOrEqual(10);
   });
 
+  it("brings back incidents and owner replies on a fresh machine", async () => {
+    const backend = mockBackend("fresh-incidents");
+    const t = await makeWarden(undefined, { backend });
+    t.chain.spend("researcher", addr(0xe2), 0.002, t.tick(1_000));
+    await t.cycle();
+    await t.warden.handleOwner({ kind: "button", data: button(t.owner, "always") });
+    await t.memory.flush();
+
+    const fresh = await makeWarden(undefined, { backend });
+    expect(fresh.memory.list("incident")).toHaveLength(1);
+    expect(fresh.memory.list("feedback").length).toBeGreaterThan(0);
+  });
+
   it("keeps today's counters across a restart on a fresh machine", async () => {
     const backend = mockBackend("restart");
     const t = await makeWarden(undefined, { backend });

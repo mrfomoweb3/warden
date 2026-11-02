@@ -124,12 +124,12 @@ pnpm dashboard                            # live dashboard on :4300
 ### Automated tests
 
 ```bash
-pnpm test        # 56 TypeScript tests (vitest)
+pnpm test        # 57 TypeScript tests (vitest)
 pnpm test:move   # 7 Move tests for SpendVault
 pnpm typecheck && pnpm lint
 ```
 
-Passing looks like `Tests 6 passed (6)` for `@warden/shared`, `Tests 48 passed (48)` for `@warden/warden`, `Tests 2 passed (2)` for `@warden/agents`, and `Test result: OK. Total tests: 7; passed: 7` for Move.
+Passing looks like `Tests 6 passed (6)` for `@warden/shared`, `Tests 49 passed (49)` for `@warden/warden`, `Tests 2 passed (2)` for `@warden/agents`, and `Test result: OK. Total tests: 7; passed: 7` for Move.
 
 ## Architecture
 

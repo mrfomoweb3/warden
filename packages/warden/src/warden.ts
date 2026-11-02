@@ -3,7 +3,7 @@ import { escapeHtml, type Button, type OwnerChannel, type OwnerInput } from "@wa
 import { parseVaultEvent, queryVaultEvents, type Chain, type EventCursor, type Units, type VaultEvent } from "@warden/shared";
 import type { RiskChecker } from "./act/riskcheck.js";
 import type { VaultActuator } from "./act/vault.js";
-import type { AgentProfile, ConditionKind, Counterparty, Incident, Metric, RuleRecord } from "./memory/schema.js";
+import type { AgentProfile, ConditionKind, Counterparty, Incident, Metric, RecordType, RuleRecord } from "./memory/schema.js";
 import type { WardenMemory } from "./memory/store.js";
 import { buildContext, RecentActivity, type PaymentContext, type PaymentEvent } from "./policy/context.js";
 import { alertFacts, type AlertExplainer, type AlertFacts } from "./policy/explain.js";
@@ -68,8 +68,15 @@ export class Warden {
   /** Seeds default rules on first run and restores the observer cursor. */
   async init(): Promise<void> {
     await this.d.memory.load();
-    if (this.d.memory.list("rule").length === 0) {
-      const merged = await this.d.memory.rebuildFromWalrus(["rule", "agent_profile", "counterparty", "cursor", "metric"]).catch(() => 0);
+    // A fresh machine rebuilds everything from Walrus; a cache that predates incident restore gets the history back.
+    const missing: RecordType[] =
+      this.d.memory.list("rule").length === 0
+        ? ["rule", "agent_profile", "counterparty", "cursor", "metric", "incident", "feedback"]
+        : this.d.memory.list("incident").length === 0
+          ? ["incident", "feedback"]
+          : [];
+    if (missing.length) {
+      const merged = await this.d.memory.rebuildFromWalrus(missing).catch(() => 0);
       if (merged) this.log(`restored ${merged} records from Walrus Memory`);
     }
     if (this.d.memory.list("rule").length === 0) {
