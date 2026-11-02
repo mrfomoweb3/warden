@@ -66,18 +66,22 @@ export class LlmResearcher {
         max_tokens: 1000,
         ...(this.groq.model.startsWith("openai/gpt-oss") ? { reasoning_effort: "low" } : {}),
         // Native function calling: the only things the model can do are these three calls.
-        // Out of budget, done is the only call left.
-        tools: toolsFor(this.vendors).filter((t) => !mustFinish || t.function.name === "done"),
-        tool_choice: "required",
+        // Out of budget, there are no calls left: it answers in plain text.
+        ...(mustFinish ? {} : { tools: toolsFor(this.vendors), tool_choice: "required" }),
         messages: [
           { role: "system", content: system },
-          { role: "user", content: transcript.join("\n") },
+          { role: "user", content: transcript.join("\n") + (mustFinish ? "\nYour budget is used up. Answer the question now in one or two sentences of plain text." : "") },
         ],
       }),
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) throw new Error(`groq ${res.status}: ${(await res.text()).slice(0, 200)}`);
-    const body = (await res.json()) as { choices?: { message?: { tool_calls?: { function: { name: string; arguments: string } }[] } }[] };
+    const body = (await res.json()) as { choices?: { message?: { content?: string; tool_calls?: { function: { name: string; arguments: string } }[] } }[] };
+    if (mustFinish) {
+      const answer = body.choices?.[0]?.message?.content?.trim();
+      if (!answer) throw new Error("the model gave no answer");
+      return { action: "done", answer: answer.slice(0, 400) };
+    }
     const call = body.choices?.[0]?.message?.tool_calls?.[0]?.function;
     if (!call) throw new Error("the model didn't choose a step");
     return validStep({ ...JSON.parse(call.arguments || "{}"), action: call.name }, this.vendors);
