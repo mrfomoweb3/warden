@@ -84,9 +84,10 @@ async function state() {
     totals: {
       payments: sum("events"),
       silent: sum("auto_handled"),
-      questions: sum("escalations"),
-      pauses: sum("pauses"),
-      tightens: sum("tightens"),
+      // Daily counters can be missing after a restore; incidents are the durable record of each act.
+      questions: Math.max(sum("escalations"), incidents.filter((i) => i.action === "escalate").length),
+      pauses: Math.max(sum("pauses"), incidents.filter((i) => i.action === "pause").length),
+      tightens: Math.max(sum("tightens"), incidents.filter((i) => i.action === "tighten").length),
       rulesLearned: learned.length,
       // The write counter is local; after a restore, the records rebuilt from Walrus are on Walrus too.
       memoryWrites: Math.max(s.written, s.records.length),
