@@ -67,7 +67,8 @@ export class LlmResearcher {
         ...(this.groq.model.startsWith("openai/gpt-oss") ? { reasoning_effort: "low" } : {}),
         // Native function calling: the only things the model can do are these three calls.
         // Out of budget, there are no calls left: it answers in plain text.
-        ...(mustFinish ? {} : { tools: toolsFor(this.vendors), tool_choice: "required" }),
+        // Vendors are shuffled each call: the model otherwise always picks the first ones listed.
+        ...(mustFinish ? {} : { tools: toolsFor(shuffled(this.vendors)), tool_choice: "required" }),
         messages: [
           { role: "system", content: system },
           { role: "user", content: transcript.join("\n") + (mustFinish ? "\nYour budget is used up. Answer the question now in one or two sentences of plain text." : "") },
@@ -86,6 +87,15 @@ export class LlmResearcher {
     if (!call) throw new Error("the model didn't choose a step");
     return validStep({ ...JSON.parse(call.arguments || "{}"), action: call.name }, this.vendors);
   }
+}
+
+function shuffled<T>(xs: T[]): T[] {
+  const out = [...xs];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j]!, out[i]!];
+  }
+  return out;
 }
 
 function toolsFor(vendors: string[]) {
