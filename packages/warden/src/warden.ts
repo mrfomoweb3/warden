@@ -65,20 +65,14 @@ export class Warden {
 
   // ─── lifecycle ──────────────────────────────────────────────────────────
 
-  /** Seeds default rules on first run and restores the observer cursor. */
+  /** Merges Walrus Memory into the local cache, seeds default rules on first run, restores the observer cursor. */
   async init(): Promise<void> {
     await this.d.memory.load();
-    // A fresh machine rebuilds everything from Walrus; a cache that predates incident restore gets the history back.
-    const missing: RecordType[] =
-      this.d.memory.list("rule").length === 0
-        ? ["rule", "agent_profile", "counterparty", "cursor", "metric", "incident", "feedback"]
-        : this.d.memory.list("incident").length === 0
-          ? ["incident", "feedback"]
-          : [];
-    if (missing.length) {
-      const merged = await this.d.memory.rebuildFromWalrus(missing).catch(() => 0);
-      if (merged) this.log(`restored ${merged} records from Walrus Memory`);
-    }
+    // Merge from Walrus on every start: a fresh machine gets everything back, and a local cache
+    // picks up anything it missed. Only newer revisions win, so nothing local is overwritten.
+    const types: RecordType[] = ["rule", "agent_profile", "counterparty", "cursor", "metric", "incident", "feedback"];
+    const merged = await this.d.memory.rebuildFromWalrus(types).catch(() => 0);
+    if (merged) this.log(`restored ${merged} records from Walrus Memory`);
     if (this.d.memory.list("rule").length === 0) {
       for (const r of defaultRules(new Date(this.now()).toISOString())) this.d.memory.put(r);
       this.log("seeded default (week-1) rules");

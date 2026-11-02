@@ -32,6 +32,22 @@ export function encodeMemory(record: MemoryRecord, rev: number, at = new Date().
   return `${describe(record)}${MARKER}type=${record.type} key=${keyOf(record)} rev=${rev} at=${at}---\n${JSON.stringify(record)}`;
 }
 
+/**
+ * One recall query per record type, worded like that type's describe() sentence. Recall is
+ * semantic: a bare "Warden incident" lands nearer the high-churn metric and cursor lines,
+ * whose many revisions then crowd every incident out of the results.
+ */
+const RECALL_QUERY: Record<RecordType, string> = {
+  rule: "Warden rule (active, from telegram feedback default) → allow escalate pause tighten",
+  agent_profile: "Agent profile: normally spends per day, usual counterparties, calls/hour at peak",
+  counterparty: "Counterparty first seen, payments totalling, trust, risk score",
+  incident: "Incident on agent: Warden action pause escalate. Status open resolved",
+  feedback: "Owner feedback on incident: changed rule",
+  activity: "Activity: payments, rejected, counterparties",
+  metric: "Warden metrics: payments seen, handled silently, questions to owner, pauses, rules learned",
+  cursor: "Warden observer cursor at checkpoint",
+};
+
 export function decodeMemory(text: string): { record: MemoryRecord; rev: number } | null {
   const i = text.indexOf(MARKER);
   if (i < 0) return null;
@@ -83,7 +99,7 @@ export class WardenMemory {
   async rebuildFromWalrus(types: RecordType[], perType = 100): Promise<number> {
     let merged = 0;
     for (const type of types) {
-      const hits = await this.backend.recall(`Warden ${type.replace("_", " ")}`, perType);
+      const hits = await this.backend.recall(RECALL_QUERY[type], perType);
       for (const hit of hits) {
         const d = decodeMemory(hit.text);
         if (!d || d.record.type !== type) continue;
