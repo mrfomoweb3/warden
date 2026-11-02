@@ -21,6 +21,12 @@ primary_region = "fra"
     path = "/"
     timeout = "5s"
 
+# Warden's state cache (memory.json, visitors, replay history) survives deploys and restarts.
+# A fresh volume is fine: Warden rebuilds from Walrus Memory.
+[mounts]
+  source = "warden_state"
+  destination = "/app/.warden"
+
 [[vm]]
   size = "shared-cpu-1x"
   memory = "1gb"

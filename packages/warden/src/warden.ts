@@ -235,10 +235,11 @@ export class Warden {
         if (!res.done && res.note === "already paused") continue;
         const inc = this.openIncident(ctx, decision, what, kinds, "pause", res.note);
         metric.pauses++;
+        const contained = res.done ? this.contain(inc, ctx, decision) : "";
         // The pause is already on-chain; the explanation only follows it.
         const why = await this.explain(inc, alertFacts(ctx, decision, "pause", res.done ? "done" : "failed"));
         const msgId = await this.d.owner.send(
-          `⛔ Paused <b>${escapeHtml(ctx.agent)}</b>: ${escapeHtml(what)}.\nVault tx: <code>${escapeHtml(res.note)}</code>${why}\nIt stays paused until you say so.`,
+          `⛔ Paused <b>${escapeHtml(ctx.agent)}</b>: ${escapeHtml(what)}.\nVault tx: <code>${escapeHtml(res.note)}</code>${contained}${why}\nIt stays paused until you say so.`,
           incidentButtons(inc.id, true),
         );
         if (msgId) this.messageIncident.set(msgId, inc.id);
@@ -253,6 +254,27 @@ export class Warden {
       }
     }
     this.d.memory.put(metric, { durable: false });
+  }
+
+  /**
+   * Records how much a burst got through before its pause landed (payments to the same
+   * counterparty within the widest velocity window that fired, 10 min otherwise) and how
+   * long Warden took from the payment that crossed the line to the pause.
+   */
+  private contain(inc: Incident, ctx: PaymentContext, decision: Decision): string {
+    const windowMin = Math.max(10, ...decision.triggers.flatMap((t) => (t.rule.condition.kind === "velocity" ? [t.rule.condition.window_min] : [])));
+    const b = this.recent.burst(ctx.agent, ctx.counterparty, ctx.event.ts - windowMin * 60_000);
+    if (!b.payments || b.firstTs === null) return "";
+    const pausedAt = this.now();
+    const contained = {
+      payments: b.payments,
+      usd: this.d.units.toUsd(b.amount),
+      first_payment: new Date(b.firstTs).toISOString(),
+      paused_at: new Date(pausedAt).toISOString(),
+      seconds: Math.max(0, Math.round((pausedAt - ctx.event.ts) / 1000)),
+    };
+    this.d.memory.put({ ...(this.d.memory.get("incident", inc.id) ?? inc), contained });
+    return `\nContained: ${contained.payments} payments (${usd(contained.usd)}) got through; paused ${contained.seconds}s after the payment that crossed the line. Every later attempt is refused by the vault.`;
   }
 
   /**

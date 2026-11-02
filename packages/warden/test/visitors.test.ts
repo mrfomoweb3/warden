@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { mockBackend } from "../src/memory/walrus.js";
 import type { PaymentContext } from "../src/policy/context.js";
 import { PatternIntentParser } from "../src/policy/parser.js";
+import { defaultRules } from "../src/policy/rules.js";
 import { VisitorRegistry, type VisitorDeps } from "../src/visitors.js";
 import { addr } from "./helpers.js";
 
@@ -193,5 +194,46 @@ describe("visitor persistence", () => {
     const fresh = make({ backend });
     await fresh.visitors.init();
     expect(fresh.visitors.get(s.address)).toMatchObject({ agentName: "walrus-bot", watches: "pricebot" });
+  });
+});
+
+describe("guest sessions", () => {
+  it("gives a wallet-less visitor the same steps, kept off Walrus and rate-limited per IP", async () => {
+    const writes: string[] = [];
+    const backend = { write: async (text: string) => void writes.push(text), recall: async () => [] };
+    const t = make({ backend });
+    const g = await t.visitors.guest("1.2.3.4");
+    const v = t.visitors.authenticate(g.token);
+    expect(t.visitors.view(v).guest).toBe(true);
+    await t.visitors.setAgent(v, "guest-bot", "researcher");
+    await t.visitors.addRule(v, "ask me before any new counterparty over $0.01");
+    expect(await link(t.visitors, v)).toContain("your guest session");
+    expect(writes).toHaveLength(0);
+    for (let i = 0; i < 4; i++) await t.visitors.guest("1.2.3.4");
+    await expect(t.visitors.guest("1.2.3.4")).rejects.toThrow(/Too many guest sessions/);
+    await expect(t.visitors.guest("5.6.7.8")).resolves.toHaveProperty("token");
+  });
+});
+
+describe("day 1 vs today", () => {
+  it("decides the same real payments under the defaults and under learned rules", async () => {
+    const t = make();
+    await t.visitors.observe([ctx(), ctx({ event: { ...ctx().event, digest: "x", ts: 2_000 } })]);
+    const learned = [
+      {
+        type: "rule" as const,
+        id: "learned_1",
+        text: "researcher may pay new counterparties under $0.01",
+        scope: { agent: "researcher" },
+        condition: { kind: "new_counterparty" as const },
+        action: "allow" as const,
+        amount_max_usd: 0.01,
+        source: "feedback" as const,
+        created: "",
+        enabled: true,
+      },
+    ];
+    const r = t.visitors.learning([...defaultRules(), ...learned]);
+    expect(r).toMatchObject({ payments: 2, since: 1_000, day1: { escalate: 2, allow: 0 }, today: { escalate: 0, allow: 2 } });
   });
 });

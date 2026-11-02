@@ -99,7 +99,10 @@ a.tx { color: var(--olive); text-decoration: none; border-bottom: 1px solid rgba
       <div class="head"><h2>Connect a wallet</h2><span class="tag" id="t1"></span></div>
       <p class="hint">Any Sui wallet works (Slush, Suiet, Phantom…). You'll sign a short message to prove the address is yours.</p>
       <p class="hint">If your wallet warns about this site: it's a new hackathon demo on a shared host, which some phishing filters flag on sight. This page only asks for a free sign-in signature, never a transaction or approval. <a href="https://github.com/mrfomoweb3/warden" target="_blank" rel="noopener">Check the source</a>, or try Suiet or Phantom.</p>
-      <div id="connectArea"><div class="wallets" id="wallets"></div></div>
+      <div id="connectArea">
+        <div class="wallets" id="wallets"></div>
+        <p class="hint" style="margin:14px 0 0">No Sui wallet? <button class="x" type="button" id="guestBtn">Continue as a guest</button> You get the same steps; your rules stay on this server instead of Walrus Memory.</p>
+      </div>
       <div class="msg" id="m1"></div>
     </div>
   </div>
@@ -234,6 +237,16 @@ async function signIn(wallet) {
   }
 }
 
+$("guestBtn").onclick = async () => {
+  say("m1", "Starting a guest session…");
+  try {
+    const out = await api("guest", {});
+    token = out.token; store.set(token); me = out.me;
+    say("m1", "");
+    render();
+  } catch (e) { say("m1", e.message, "err"); }
+};
+
 // ── steps 2-5 ─────────────────────────────────────────────────────────────
 $("agentForm").onsubmit = async (e) => {
   e.preventDefault();
@@ -313,7 +326,7 @@ function render() {
   }
   $("connectArea").hidden = true;
   $("m1").className = "msg";
-  $("m1").innerHTML = `<span class="who">Signed in as <span class="mono">${esc(short(me.address))}</span> <button class="x" type="button" id="signOut">Sign out</button></span>`;
+  $("m1").innerHTML = `<span class="who">${me.guest ? "Guest session" : `Signed in as <span class="mono">${esc(short(me.address))}</span>`} <button class="x" type="button" id="signOut">Sign out</button></span>`;
   $("signOut").onclick = () => { token = ""; store.set(""); me = null; say("m1", ""); render(); };
   $("net").textContent = `Sui ${me.network}`;
 

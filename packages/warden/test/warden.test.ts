@@ -54,6 +54,10 @@ describe("Warden learning loop", () => {
     expect(t.vault.calls.filter((c) => c.startsWith("pause:"))).toEqual([`pause:${AGENT_IDS.rogue}`]);
     const inc = t.memory.list("incident").find((i) => i.action === "pause")!;
     expect(inc.what).toMatch(/paid 0x0000…00b1 30× in 10 min/);
+    // Everything that reached the same API within the 10-minute window; 12 s from the 30th payment (+59 s) to the pause (+71 s).
+    expect(inc.contained).toMatchObject({ payments: 36, seconds: 12 });
+    expect(inc.contained!.usd).toBeCloseTo(0.072, 6);
+    expect(t.owner.sent.find((m) => m.text.startsWith("⛔"))!.text).toContain("Contained: 36 payments ($0.072)");
 
     // Owner keeps it paused; the rogue keeps hammering and gets rejected on-chain.
     await t.warden.handleOwner({ kind: "button", data: button(t.owner, "keep") });

@@ -62,11 +62,15 @@ Agents spend only through **SpendVault**, a Move contract. Warden holds a `Warde
 
 - **Watches every payment through one call.** Every agent spends through one vault, so a single Tatum Sui gRPC query per cycle covers all of them.
 - **Acts on-chain, not just alerts.** It pauses a looping agent or lowers its caps through SpendVault. The vault then refuses the agent's payments until you unpause it.
+- **Caps block, Warden contains.** The vault refuses anything over an agent's caps on its own. Warden sees each payment once it lands, so it limits damage rather than vetoing single payments: it pauses a runaway before the burst drains the day's cap, and records how many payments got through and how many seconds the pause took (the dashboard's **Runaway stopped** card).
+- **Shows what learning changed, on live data.** The dashboard's **Day 1 vs today** card decides the same recent real payments twice, under the week-one defaults and under today's learned rules, and counts the questions each would have asked you.
 - **Rules in plain English.** "Block anything over $20/day" becomes an on-chain daily cap. A Groq-hosted model parses the wording; a pattern parser covers the demo phrasings without a key.
 - **Learns from your replies.** "Always allow" on a question becomes an allow rule. After 3 approvals of new vendors for one agent, Warden generalises to an amount-bounded rule and tells you.
 - **Explains its alerts.** Each Telegram alert carries a short plain-language "why", written by the model from facts Warden already computed. The model never makes or delays a decision.
 - **Remembers everything in Walrus Memory.** Rules, incidents, replies, counterparties and daily baselines are written to Walrus as they happen, and are readable from Claude Code.
 - **Pays for its own due diligence.** For an unknown counterparty, Warden buys a risk check over x402 from its own small wallet.
+
+**The demo agents.** `researcher` is an LLM agent: for each research question, a Groq-hosted model decides which paid API to call and from which vendor (at most 3 calls), pays each call from the vault over x402, and writes a short answer. It can only pick whitelisted calls with validated arguments, never a URL. `pricebot` (a steady price feed) and `rogue` (which can be switched into a retry loop) are scripted. The paid APIs serve demo data; the payments are real testnet transactions.
 
 ## How to test
 
@@ -74,7 +78,7 @@ Agents spend only through **SpendVault**, a Move contract. Warden holds a `Warde
 
 Open [usewarden.fly.dev/try](https://usewarden.fly.dev/try):
 
-1. **Connect a wallet.** Any Sui wallet works (Slush works with a Google account). You sign a one-time message. It costs nothing and moves no funds.
+1. **Connect a wallet.** Any Sui wallet works (Slush works with a Google account). You sign a one-time message. It costs nothing and moves no funds. No wallet? **Continue as a guest**: same steps, but your rules stay on the server instead of Walrus Memory.
 2. **Name your agent** and pick a demo agent to watch (`pricebot`, `researcher` or `rogue`).
 3. **Set a rule in plain English**, e.g. "ask me before any new counterparty over $0.01". Warden's real parser turns it into a rule record.
 4. **See what Warden would do.** Your rules plus the week-one defaults run on that agent's latest real testnet payments, each linked to Suiscan.
@@ -107,7 +111,7 @@ Requires the keys in [Environment variables](#environment-variables) and a deplo
 ```bash
 pnpm paid-apis                            # x402 services on :4021
 pnpm warden                               # the watchdog
-pnpm agents                               # researcher + pricebot + rogue, behaving
+pnpm agents                               # researcher (LLM) + pricebot + rogue, behaving
 pnpm dashboard                            # live dashboard on :4300
 ```
 
@@ -120,12 +124,12 @@ pnpm dashboard                            # live dashboard on :4300
 ### Automated tests
 
 ```bash
-pnpm test        # 52 TypeScript tests (vitest)
+pnpm test        # 56 TypeScript tests (vitest)
 pnpm test:move   # 7 Move tests for SpendVault
 pnpm typecheck && pnpm lint
 ```
 
-Passing looks like `Tests 6 passed (6)` for `@warden/shared`, `Tests 46 passed (46)` for `@warden/warden`, and `Test result: OK. Total tests: 7; passed: 7` for Move.
+Passing looks like `Tests 6 passed (6)` for `@warden/shared`, `Tests 48 passed (48)` for `@warden/warden`, `Tests 2 passed (2)` for `@warden/agents`, and `Test result: OK. Total tests: 7; passed: 7` for Move.
 
 ## Architecture
 
@@ -255,7 +259,7 @@ packages/
   shared/      Tatum gRPC client and rate limiter, vault events (BCS) and tx builders, x402 client + gate
   warden/      the agent: memory/ (Walrus), policy/ (rules, parser, alert explainer), act/, graph.ts (LangGraph), main.ts
   bot/         Telegram owner channel (raw Bot API) + console fallback
-  agents/      researcher / pricebot / rogue, one-time vault setup, coin-from-balance helper
+  agents/      researcher (LLM agent) / pricebot / rogue, one-time vault setup, coin-from-balance helper
   paid-apis/   x402 demo services: search, price feed, counterparty risk check
   dashboard/   landing page + dashboard over Warden's state (live or a 14-day simulation)
 docs/          demo script and screenshots

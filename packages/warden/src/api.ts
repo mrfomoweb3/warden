@@ -4,6 +4,7 @@
  * the Warden process directly.
  */
 import { createServer, type IncomingMessage, type Server } from "node:http";
+import type { RuleRecord } from "./memory/schema.js";
 import { VisitorError, type VisitorRegistry } from "./visitors.js";
 
 const MAX_BODY = 8_192;
@@ -25,7 +26,7 @@ async function body(req: IncomingMessage): Promise<Record<string, unknown>> {
 
 const str = (v: unknown): string => (typeof v === "string" ? v : "");
 
-export function startVisitorApi(visitors: VisitorRegistry, port: number, log: (m: string) => void): Server {
+export function startVisitorApi(visitors: VisitorRegistry, port: number, log: (m: string) => void, rules: () => RuleRecord[] = () => []): Server {
   const server = createServer(async (req, res) => {
     const send = (status: number, data: unknown) => {
       res.writeHead(status, { "content-type": "application/json", "cache-control": "no-store" });
@@ -36,11 +37,19 @@ export function startVisitorApi(visitors: VisitorRegistry, port: number, log: (m
       const auth = () => visitors.authenticate(/^Bearer (.+)$/.exec(req.headers.authorization ?? "")?.[1]);
       const route = `${req.method} ${path}`;
       switch (route) {
+        // Aggregate only, no visitor data: read by the dashboard server, not proxied to the public.
+        case "GET /learning":
+          return send(200, visitors.learning(rules()));
         case "GET /visitor/nonce":
           return send(200, visitors.issueNonce());
         case "POST /visitor/login": {
           const b = await body(req);
           const { token, address } = await visitors.login(str(b.address), str(b.message), str(b.signature));
+          return send(200, { token, me: visitors.view(visitors.get(address)!) });
+        }
+        case "POST /visitor/guest": {
+          const ip = str(req.headers["x-visitor-ip"]) || req.socket.remoteAddress || "unknown";
+          const { token, address } = await visitors.guest(ip);
           return send(200, { token, me: visitors.view(visitors.get(address)!) });
         }
         case "GET /visitor/me":
